@@ -1,0 +1,13 @@
+= Analyse de Couverture — container-provision-gradle
+
+== Métriques
+
+|===
+| Métrique | Valeur
+| Tests unitaires (JUnit5) | 0
+| Tests fonctionnels (Gradle TestKit) | 0
+| Couverture | N/A
+|===
+
+Aucun test implémenté en session 000 (bootstrap gouvernance + code initial).
+Les tests seront écrits en session 001 (CP-2).

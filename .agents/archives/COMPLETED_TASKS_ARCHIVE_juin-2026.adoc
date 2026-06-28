@@ -1,0 +1,19 @@
+= COMPLETED_TASKS_ARCHIVE — Juin 2026 — container-provision-gradle
+
+== Sessions archivées
+
+=== S000 — Bootstrap gouvernance + code initial
+- Création structure projet (settings.gradle.kts, build.gradle.kts)
+- ContainerProvisionPlugin.kt (3 tâches : installPlaywright, npmInstallPlaywright, provisionColabTranslation)
+- ContainerProvisionExtension.kt (DSL : colabNotebookUrl, targetLangs, siteRepoUrl)
+- playwright/colab-worker.mjs (Playwright Chromium → Colab)
+- colab/start-ollama-tunnel.ipynb (notebook auto-content)
+- .agents/ (AGENT, INDEX, BACKLOG, PROMPT_REPRISE, SESSIONS_HISTORY)
+- Enregistrement dans AGENTS.adoc racine
+- Git init + push sur cccp-education/container-provision-gradle
+
+== Points ouverts à reporter
+
+- CP-1 Playwright Colab auth Google
+- CP-2 Tests
+- CP-6 Publication Maven Central

@@ -1,0 +1,9 @@
+.gradle/
+/build/
+container-provision-plugin/build/
+!gradle/wrapper/gradle-wrapper.jar
+.idea/
+*.iml
+.kotlin/
+local.properties
+*.bak

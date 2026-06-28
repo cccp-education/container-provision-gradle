@@ -1,0 +1,56 @@
+= BACKLOG — container-provision-gradle
+
+== EPIC CP-0 : Bootstrap gouvernance + structure projet (P0)
+
+*Statut* : ✅ TERMINÉ (Session 000)
+
+- [x] Créer settings.gradle.kts + build.gradle.kts
+- [x] Créer ContainerProvisionPlugin.kt + ColabTranslationTask (Playwright Java)
+- [x] Créer ContainerProvisionExtension.kt (DSL : colabNotebookUrl, targetLangs, siteRepoUrl, chromeUserDataDir)
+- [x] Dépendance Playwright Java (com.microsoft.playwright:playwright:1.51.0) — pas de Node.js
+- [x] Créer colab/start-ollama-tunnel.ipynb (notebook autonome)
+- [x] Créer .agents/ (AGENT, INDEX, BACKLOG, PROMPT_REPRISE)
+- [x] Enregistrer container-provision-gradle dans AGENTS.adoc racine
+- [x] Nettoyer historique ALGER (dashboard-gradle)
+
+== EPIC CP-1 : Playwright Node.js Colab automation (P0)
+
+*Statut* : 🔄 CODE ÉCRIT
+
+- [x] playwright/colab-worker.mjs — navigation Colab, attente runtime, Run All, poll TRANSLATION_DONE
+- [ ] Gérer la popup auth Google (user-data-dir avec profil Chrome connecté)
+- [ ] Gérer le cas où le runtime Colab est déjà connecté
+- [ ] Timeout configurable via DSL
+- [ ] Logs structurés (Gradle output)
+
+== EPIC CP-2 : Tests Playwright + gestion auth Google (P0)
+
+*Statut* : À FAIRE
+
+- [ ] Tester le flux avec un user-data-dir mocké
+- [ ] Tester la détection de bouton "Run all" (plusieurs sélecteurs)
+- [ ] Tester le parsing de TRANSLATION_DONE
+- [ ] Documenter la configuration Chrome profil pour auth Google
+
+== EPIC CP-3 : Pool de ports 3 instances Ollama (P1)
+
+*Statut* : À FAIRE
+
+- [ ] Port pool (11437-11465)
+- [ ] 3 workers parallèles dans le notebook Colab
+- [ ] Répartition des langues entre workers
+
+== EPIC CP-4 : Intégration bakery i18n (P1)
+
+*Statut* : À FAIRE
+
+- [ ] Créer un consumer script Gradle qui enchaîne provisionColabTranslation → attend URL → lance migrateContentI18n
+- [ ] Wire dans runner-gradle (N4)
+
+== EPIC CP-5 : Tests d'intégration CI (P1)
+
+*Statut* : À FAIRE
+
+== EPIC CP-6 : Publication Maven Central (P2)
+
+*Statut* : À FAIRE

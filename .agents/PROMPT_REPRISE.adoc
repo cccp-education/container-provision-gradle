@@ -1,0 +1,6 @@
+== Mission Session 001 — Tests Playwright + auth Google
+
+- Finaliser CP-1 : gestion auth Google (user-data-dir Chrome), timeout configurable
+- CP-2 : Écrire les tests du colab-worker.mjs
+- Tester le flux complet : ouverture Colab, connexion runtime, Run All, détection TRANSLATION_DONE
+- Documenter la configuration du profil Chrome pour auth Google persistée

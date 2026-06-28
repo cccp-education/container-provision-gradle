@@ -1,0 +1,6 @@
+== Sessions — container-provision-gradle
+
+|===
+| # | Date | Type | Sujet | Score
+| 000 | 2026-06-28 | gouvernance + dev | Bootstrap container-provision-gradle + code initial Playwright/Colab | 8/10
+|===

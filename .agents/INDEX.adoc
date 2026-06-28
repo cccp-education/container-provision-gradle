@@ -1,0 +1,56 @@
+= INDEX — container-provision-gradle
+
+_Dernière mise à jour : 2026-06-28_
+_Session en cours : 000 — Bootstrap gouvernance (clôturée)_
+_Sessions terminées : 1_
+
+== Roadmap
+
+|===
+| EPIC | Description | Statut | Priorité
+| CP-0 | Bootstrap gouvernance + structure projet | ✅ TERMINÉ | P0
+| CP-1 | Playwright Java Colab automation (migré depuis Node.js) | 🔄 EN COURS | P0
+| CP-2 | Tests Playwright Java + gestion auth Google | À FAIRE | P0
+| CP-3 | Pool de ports 3 instances Ollama (parallélisation) | À FAIRE | P1
+| CP-4 | Intégration bakery i18n (consommateur colab-worker) | À FAIRE | P1
+| CP-5 | Tests d'intégration CI | À FAIRE | P1
+| CP-6 | Publication Maven Central | À FAIRE | P2
+|===
+
+== Structure du projet
+
+```
+container-provision-gradle/
+├── settings.gradle.kts
+├── build.gradle.kts
+├── container-provision-plugin/
+│   ├── build.gradle.kts          → plugin education.cccp.container-provision
+│   ├── gradle/libs.versions.toml
+│   ├── playwright/
+│   │   ├── package.json
+│   │   └── colab-worker.mjs      → Playwright Chromium → Colab automation
+│   └── src/main/kotlin/container/provision/
+│       ├── ContainerProvisionPlugin.kt      → 3 tâches (install, npm, colab)
+│       └── ContainerProvisionExtension.kt   → DSL extension
+├── colab/
+│   └── start-ollama-tunnel.ipynb → Notebook Colab autonome (Ollama + Gradle bakery)
+├── .agents/AGENT.adoc, INDEX.adoc, BACKLOG.adoc
+└── Gradle wrapper + LICENSE
+```
+
+== Sessions
+
+|===
+| # | Date | Type | Sujet | Score
+| 000 | 2026-06-28 | gouvernance | Bootstrap + code initial (Playwright Node.js, Colab notebook, gouvernance) | 8/10
+|===
+
+== Fichiers
+
+|===
+| Fichier | Rôle
+| `AGENT.adoc` | Règles absolues + architecture
+| `BACKLOG.adoc` | Suivi des tâches
+| `PROMPT_REPRISE.adoc` | Mission en cours
+| `colab/start-ollama-tunnel.ipynb` | Notebook Colab autonome
+|===

@@ -1,0 +1,48 @@
+= AGENT — container-provision-gradle
+
+== Règles Absolues
+
+. Zéro commit sans permission explicite
+. Lire PROMPT_REPRISE.adoc avant toute action
+. Vérifier git status avant de coder
+. Privilégier Edit (partiel) plutôt que Write (écrasement)
+. Signaler tout fichier gitignoré — ne jamais le lire
+. Fin de session : 7 étapes obligatoires (rapport, PROMPT_REPRISE, INDEX, historique, tests, archive, backlog)
+
+== Architecture
+
+container-provision-gradle est un plugin N0 partagé par les boroughs N2
+(bakery, slider, capsule, plantuml) qui ont besoin de runtimes LLM GPU.
+
+Mode unique :
+
+- *Colab* : Playwright Java → ouvre un notebook Colab, execute le worker,
+  attend `TRANSLATION_DONE=ok`
+
+Consommé par un plugin N2 (bakery-gradle) qui applique `education.cccp.container-provision`
+et définit sa propre tâche aggregate :
+
+[source,kotlin]
+plugins { id("education.cccp.container-provision") }
+
+task migrateContentI18n {
+    dependsOn("provisionColabTranslation")
+}
+
+Usage :
+
+[source,shell]
+./gradlew migrateContentI18n \
+  -Pcpr.chromeUserDataDir=/home/user/snap/chromium/common/chromium/Profile\ 2 \
+  -Pcpr.targetLangs=fr,ar,zh \
+  -Pcpr.siteRepoUrl=https://github.com/org/site.git
+
+Le préfixe `cpr.*` est lu par le plugin. Le profil Chrome doit être
+pré-authentifié à Google pour que Playwright ouvre Colab sans popup.
+Runner-gradle (N3) orchestre l'appel à `migrateContentI18n` sans connaître
+les détails du provisionnement.
+
+== Dépendances
+
+- Playwright Java 1.51.0 (via Maven Central)
+- Kotlin 2.3.20 / JDK 21
