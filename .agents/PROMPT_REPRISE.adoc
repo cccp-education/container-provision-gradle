@@ -1,33 +1,29 @@
-== Mission Session 003 — Publier bakery-plugin 0.0.3 + tester Colab réel
+== Mission Session 004 — Relancer notebook Colab (BOM 0.0.6 + bakery 0.0.3)
 
 === Contexte
-Session 002 : BOM 0.0.5 publié sur Maven Central. Le notebook Colab utilise
-le pattern `buildscript + platform() + apply()` qui résout le conflit
-annotations. Test local validé en dry-run.
-
-=== Blocage restant
-bakery-plugin 0.0.2 sur Maven Central ne contient pas les changements i18n
-en cours (33 fichiers modifiés non committés dans bakery-gradle). Le notebook
-Colab utilise `classpath("education.cccp:bakery-plugin")` sans version → le BOM
-fournit 0.0.2, mais la tâche `migrateContentI18n` nécessite le code i18n récent.
+Session 013 (workspace-bom) : BOM 0.0.6 publié sur Central. SEC-1 audit
+terminé (0 coupable). Notebook Colab mis à jour : BOM 0.0.6 + port 11440.
 
 === Étapes
-1. Committer les 33 fichiers i18n de bakery-gradle (BKY-I18N + content migration)
-2. Bump bakery-plugin 0.0.2 → 0.0.3 dans build.gradle.kts + workspace-bom toml
-3. Publier bakery-plugin 0.0.3 sur Maven Central (nmcp)
-4. Publier workspace-bom 0.0.6 (qui référence bakery-plugin 0.0.3) sur Maven Central
-5. Relancer le notebook Colab `start-ollama-tunnel.ipynb` sur GPU
-6. Vérifier que `content-i18n/` est créé avec les traductions fr→en
-7. Vérifier le push sur `cheroliv/office.git` (branche main)
-
-=== Une fois la traduction OK
-- Ajouter d'autres langues cibles (es, ar, zh, etc.)
-- Activer le GPU Ollama (vérifier lspci / nvidia-smi sur Colab)
+1. Ouvrir `colab/start-ollama-tunnel.ipynb` sur Google Colab (runtime GPU)
+2. Exécuter toutes les cellules :
+   - Installation Ollama + pull modèle `translategemma:4b`
+   - Détection GPU (`nvidia-smi`)
+   - Clone `cheroliv/office.git` via secret `REPO_OFFICE`
+   - Gradle `migrateContentI18n` avec bakery-plugin 0.0.3 (résolu via BOM 0.0.6)
+   - Push `content-i18n/` sur `cheroliv/office.git` (branche main)
+3. Vérifier que `content-i18n/` est créé avec traductions fr→en
+4. Si OK, ajouter langues cibles (es, ar, zh, etc.)
 
 === Contexte technique
-- BOM 0.0.5 publié sur Maven Central (bundle 77e1f71b)
-- Notebook : buildscript + platform("workspace-bom:0.0.5") + apply(plugin)
+- BOM 0.0.6 sur Central (bundle 3b886b28)
+- bakery-plugin 0.0.3 sur Central (publié session 012)
+- Notebook : buildscript + platform("workspace-bom:0.0.6") + apply(bakery)
+- Port Ollama : 11440 (était 11434 INTERDIT, corrigé session 013)
 - Site : `cheroliv/office.git` → `sites/cheroliv.com/jbake/content/`
-- Source language : fr, target : en
+- Source : fr, target : en
 - Modèle : `translategemma:4b`
 - Secrets Colab : `REPO_OFFICE`, `site_name`, `github-api-key-cheroliv`
+
+=== Note
+Le notebook ne peut pas être exécuté depuis CLI — il faut Colab runtime GPU.

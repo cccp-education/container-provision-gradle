@@ -1,0 +1,42 @@
+= Session 003 — BOM 0.0.6 + notebook Colab mis à jour
+:session: 003
+:date: 2026-06-30
+:type: ops
+:score: 8/10
+
+== Objectif
+
+Préparer le notebook Colab pour relancer la traduction bakery i18n avec
+BOM 0.0.6 + bakery-plugin 0.0.3.
+
+== Ce qui a été fait
+
+=== 1. Notebook Colab mis à jour
+
+- `colab/start-ollama-tunnel.ipynb` :
+  - `workspace-bom:0.0.5` → `0.0.6`
+  - Port `11434` (interdit) → `11440` (3 cellules : détection Ollama, build.gradle.kts, commande Gradle)
+
+=== 2. PROMPT_REPRISE mis à jour
+
+Documente les étapes pour relancer le notebook sur Colab (runtime GPU) :
+- Installation Ollama + pull `translategemma:4b`
+- Clone `cheroliv/office.git`
+- Gradle `migrateContentI18n` avec bakery-plugin 0.0.3 (résolu via BOM 0.0.6)
+- Push `content-i18n/` sur `cheroliv/office.git`
+
+== Fichiers modifiés
+
+* `colab/start-ollama-tunnel.ipynb`
+* `.agents/PROMPT_REPRISE.adoc`
+
+== Note
+
+Le notebook ne peut pas être exécuté depuis CLI — il faut Colab runtime GPU.
+Le notebook est prêt à être relancé manuellement.
+
+== Prochaines étapes
+
+* Relancer le notebook sur Colab (runtime GPU)
+* Vérifier `content-i18n/` créé + push sur office.git
+* Ajouter langues cibles (es, ar, zh)

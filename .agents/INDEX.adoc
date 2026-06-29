@@ -1,7 +1,8 @@
 = INDEX — container-provision-gradle
 
-_Dernière mise à jour : 2026-06-29_
-_Session en cours : 003 — Publier bakery-plugin 0.0.3 + tester Colab réel_
+_Dernière mise à jour : 2026-06-30_
+_Session en cours : aucune_
+_Session terminee : 003 — BOM 0.0.6 + notebook Colab mis à jour (BOM 0.0.6 + port 11440)_
 _Sessions terminées : 3_
 
 == Roadmap
