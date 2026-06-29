@@ -4,4 +4,5 @@
 | # | Date | Type | Sujet | Score
 | 000 | 2026-06-28 | gouvernance + dev | Bootstrap container-provision-gradle + code initial Playwright/Colab | 8/10
 | 001 | 2026-06-29 | dev + debug | Colab translation worker — Docker→Ollama direct, Drive cache, conflit annotations non résolu | 6/10
+| 002 | 2026-06-29 | dev + publication | BOM 0.0.5 : résolution conflit annotations + notebook Colab corrigé + test local validé | 8/10
 |===

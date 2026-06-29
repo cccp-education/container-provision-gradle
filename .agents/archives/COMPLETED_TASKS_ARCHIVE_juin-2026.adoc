@@ -30,3 +30,12 @@
   → `configurations.all { force }` ne couvre pas le classpath plugin
   → `buildscript {} + apply()` casse l'extension type-safe `bakery {}`
   → Piste : init.gradle.kts ou exclusion duct-tape ou bakery 0.0.3
+
+=== S002 — BOM 0.0.5 : résolution conflit annotations (2026-06-29)
+- workspace-bom 0.0.4 → 0.0.5 publié sur Maven Central (bundle 77e1f71b)
+- 11 boroughs plugins + jetbrains-annotations:26.0.2-1 dans le BOM (toml)
+- Notebook Colab : pattern buildscript + platform() + apply() + extensions.configure
+- Corrections : gradlePluginPortal() dans buildscript, String pas File pour sourceDir/outputDir
+- container-provision-plugin : platform() BOM + Playwright géré par BOM
+- Test local validé : migrateContentI18n BUILD SUCCESSFUL, zéro conflit annotations
+- *RESTE* : bakery-plugin 0.0.2 sur Central n'a pas le code i18n récent → publier 0.0.3

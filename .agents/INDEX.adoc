@@ -1,15 +1,16 @@
 = INDEX — container-provision-gradle
 
 _Dernière mise à jour : 2026-06-29_
-_Session en cours : 002 — Résoudre conflit annotations + traduction i18n_
-_Sessions terminées : 2_
+_Session en cours : 003 — Publier bakery-plugin 0.0.3 + tester Colab réel_
+_Sessions terminées : 3_
 
 == Roadmap
 
 |===
 | EPIC | Description | Statut | Priorité
 | CP-0 | Bootstrap gouvernance + structure projet | ✅ TERMINÉ | P0
-| CP-1 | Colab notebook translation worker (Ollama + bakery i18n) | 🔄 EN COURS | P0
+| EPIC CP-1 | Colab notebook translation worker (Ollama + bakery i18n) | 🔄 EN COURS | P0
+| CP-1a | Conflit annotations résolu via BOM 0.0.5 | ✅ TERMINÉ | P0
 | CP-2 | Tests Playwright Java + gestion auth Google | À FAIRE | P0
 | CP-3 | Pool de ports 3 instances Ollama (parallélisation) | À FAIRE | P1
 | CP-4 | Intégration bakery i18n (consommateur colab-worker) | À FAIRE | P1
@@ -44,6 +45,7 @@ container-provision-gradle/
 | # | Date | Type | Sujet | Score
 | 000 | 2026-06-28 | gouvernance | Bootstrap + code initial (Playwright Node.js, Colab notebook, gouvernance) | 8/10
 | 001 | 2026-06-29 | dev + debug | Colab translation worker — Docker→Ollama direct, conflit annotations non résolu | 6/10
+| 002 | 2026-06-29 | dev + publication | BOM 0.0.5 : résolution conflit annotations + notebook Colab corrigé + test local validé | 8/10
 |===
 
 == Fichiers
@@ -56,13 +58,12 @@ container-provision-gradle/
 | `colab/start-ollama-tunnel.ipynb` | Notebook Colab autonome (Ollama + Gradle bakery)
 |===
 
-== Notes Session 001
+== Notes Session 002
 
-- Docker abandonné (Colab lacks nested overlayfs + iptables CAP_NET_ADMIN)
-- Ollama installé directement via `curl | sh` + `zstd`
-- Cache Google Drive : modèle Ollama, Gradle 9.6.1, .m2, GRADLE_USER_HOME
-- Secrets Colab : REPO_OFFICE, site_name, github-api-key-cheroliv
-- JDK 25 Temurin (Eclipse Adoptium)
-- Repo : `cheroliv/office.git` → `sites/cheroliv.com/jbake/content/`
-- *BLOCAGE* : `org.jetbrains:annotations` 26.0.2-1 vs 17.0.0 sur classpath plugin
-- 14 commits pushés sur main
+- BOM 0.0.5 publié sur Maven Central (bundle 77e1f71b)
+- 11 boroughs plugins + jetbrains-annotations:26.0.2-1 dans le BOM
+- Notebook Colab : pattern buildscript + platform() + apply() (pas plugins{})
+- Test local validé : migrateContentI18n BUILD SUCCESSFUL, zéro conflit annotations
+- container-provision-plugin : platform() BOM + Playwright géré par BOM
+- *RESTE* : bakery-plugin 0.0.2 sur Central n'a pas le code i18n récent (33 fichiers
+  non committés dans bakery-gradle). Publier 0.0.3 + BOM 0.0.6 avant test Colab réel.

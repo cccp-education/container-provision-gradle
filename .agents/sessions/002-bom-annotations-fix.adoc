@@ -1,0 +1,96 @@
+= Session 002 — BOM 0.0.5 : résolution conflit annotations + notebook Colab
+
+_Date : 2026-06-29_
+_Type : dev + publication_
+_Score : 8/10_
+
+== Objectif
+
+Résoudre le blocage de la Session 001 : conflit `org.jetbrains:annotations`
+(26.0.2-1 koog vs 17.0.0 testcontainers via duct-tape) qui empêchait la tâche
+Gradle `migrateContentI18n` de s'exécuter dans le notebook Colab.
+
+== Approche
+
+Au de patcher le notebook côté Colab, la solution attaque la cause racine :
+le BOM `workspace-bom` devient le registre central des versions de tous les
+boroughs plugins + force `org.jetbrains:annotations:26.0.2-1`.
+
+== Réalisations
+
+=== workspace-bom 0.0.4 → 0.0.5
+
+1. *libs.versions.toml* — Ajout de 11 versions de boroughs plugins
+   (bakery-plugin 0.0.2, codex-plugin 0.0.2, planner-plugin 0.0.1,
+   slider-plugin 0.0.1, plantuml-plugin 0.0.1, readme-plugin 0.0.1,
+   hyperframes-plugin 0.0.1, graphify-plugin 0.0.2, api-key-pool-plugin 0.0.1,
+   codebase-plugin 0.0.3, capsule-plugin 0.0.1) + `jetbrains-annotations = "26.0.2-1"`.
+   Ajout des entries [libraries] correspondantes.
+
+2. *build.gradle.kts* — Remplacement du codex-plugin hardcodé par
+   `api(libs.bakery.plugin)` etc. pour les 11 boroughs.
+   `api(libs.jetbrains.annotations)` force la version dans le dependencyManagement.
+
+3. *Publication Maven Central* — `publishAggregationToCentralPortal` réussi.
+   Bundle `77e1f71b-3747-4bf9-a0bf-6fdcd082385c`. Version 0.0.5 disponible
+   sur Central (propagation 15-30 min).
+
+=== Notebook Colab `start-ollama-tunnel.ipynb`
+
+Passage du pattern `plugins { id(...) version "..." }` (qui ne consomme pas
+les BOM) vers `buildscript { classpath(platform(...)); classpath("bakery-plugin") }`
++ `apply(plugin = ...)` + `extensions.configure<bakery.BakeryExtension>("bakery")`.
+
+Corrections de bugs détectés lors du test local :
+- *buildscript.repositories* — ajout de `gradlePluginPortal()` (bakery dépend
+  de node-gradle et jbake-gradle-plugin qui sont sur le Portal)
+- *dependencies { classpath(...) }* — syntaxe correcte (pas `dependencies.classpath {}`)
+- *sourceDir / outputDir* — `String` pas `File` (retrait de `file(...)`)
+
+=== container-provision-plugin
+
+- `implementation(platform("education.cccp:workspace-bom:0.0.5"))` — Playwright
+  version gérée par le BOM (1.52.0 au lieu de 1.51.0 hardcodé)
+- `mavenLocal()` ajouté aux repositories (BOM pas encore sur Central lors du test)
+
+=== Test local validé
+
+Projet de test `/tmp/opencode/colab-test` avec le vrai site cheroliv.com :
+- `./gradlew tasks --all` → `migrateContentI18n` présente
+- `./gradlew migrateContentI18n` → BUILD SUCCESSFUL, **zéro conflit annotations**
+- Dry-run : 0 fichiers copiés (attendu — IA disabled)
+
+== Fichiers modifiés
+
+[cols="2,5"]
+|===
+| Fichier | Changement
+| `workspace-bom/gradle/libs.versions.toml` | +11 boroughs plugins + jetbrains-annotations
+| `workspace-bom/build.gradle.kts` | api(libs.*) pour 11 boroughs + annotations, bump 0.0.5
+| `container-provision-gradle/colab/start-ollama-tunnel.ipynb` | buildscript+platform+apply, corrections syntaxe
+| `container-provision-gradle/container-provision-plugin/build.gradle.kts` | platform() BOM + mavenLocal
+|===
+
+== Décisions techniques
+
+1. *BOM comme registre central* — Le toml est la source unique de vérité pour
+   les versions des boroughs. Tous les consommateurs (Colab, cross-boroughs)
+   consomment `platform("education.cccp:workspace-bom:0.0.5")`.
+2. *buildscript + apply* — Les `plugins {}` blocks de Gradle ne consomment pas
+   les BOM. Pour que le BOM contraigne le classpath plugin (et donc annotations),
+   le consommateur doit utiliser `buildscript { classpath(platform(...)) }` +
+   `apply(plugin=...)` + `extensions.configure<T>("name")`.
+3. *Publication avant test Colab* — Le BOM doit être sur Maven Central pour
+   que Colab (qui n'a pas mavenLocal) puisse le résoudre.
+
+== Points ouverts
+
+- *Test Colab réel* — Le notebook est prêt à être relancé sur Colab. Il faut
+  attendre la propagation Maven Central (~30 min) puis exécuter le notebook.
+- *bakery-plugin 0.0.2 non publié* — La version 0.0.2 sur Maven Central ne
+  contient pas les changements i18n en cours (git status : 33 fichiers modifiés
+  non committés). Il faudra publier bakery-plugin 0.0.3 avec les changements
+  i18n pour que le notebook Colab utilise la dernière version.
+- *colab-runner/* — Projet consommateur non inclus dans settings.gradle.kts,
+  non suivi par git. À régulariser ou supprimer.
+- *GPU non détecté* — Ollama tourne en CPU sur Colab (lspci manquant).

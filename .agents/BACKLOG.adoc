@@ -15,7 +15,7 @@
 
 == EPIC CP-1 : Colab notebook translation worker (P0)
 
-*Statut* : 🔄 EN COURS (Session 001)
+*Statut* : 🔄 EN COURS (Session 002)
 
 - [x] Notebook `start-ollama-tunnel.ipynb` autonome (Ollama + Gradle bakery)
 - [x] Install Ollama directe (curl | sh) — Docker abandonné (nested overlayfs)
@@ -24,12 +24,13 @@
 - [x] Repo correct : `cheroliv/office.git` → `sites/cheroliv.com/jbake/content/`
 - [x] JDK 25 Temurin
 - [x] Git clone + push avec token auth
-- [ ] *BLOCAGE* : Résoudre conflit `org.jetbrains:annotations` (26.0.2-1 vs 17.0.0)
-  - Piste 1 : `init.gradle.kts` avec `allprojects { configurations.all { force } }`
-  - Piste 2 : Exclure `duct-tape` (source de annotations:17.0.0)
-  - Piste 3 : `pluginManagement { resolutionStrategy }` dans settings
-  - Piste 4 : Publier bakery-plugin 0.0.3 avec exclusion
-- [ ] Vérifier que `content-i18n/` est créé après traduction
+- [x] *BLOCAGE RÉSOLU* : Conflit `org.jetbrains:annotations` résolu via BOM 0.0.5
+  - workspace-bom 0.0.5 publié sur Maven Central (11 boroughs + annotations:26.0.2-1)
+  - Notebook : pattern buildscript + platform() + apply() (pas plugins{})
+  - Test local validé : migrateContentI18n BUILD SUCCESSFUL
+- [ ] *RESTE* : Publier bakery-plugin 0.0.3 (code i18n récent non publié)
+- [ ] Publier workspace-bom 0.0.6 (qui référence bakery-plugin 0.0.3)
+- [ ] Vérifier que `content-i18n/` est créé après traduction (test Colab réel)
 - [ ] Vérifier le push sur `cheroliv/office.git`
 - [ ] Ajouter d'autres langues cibles (es, ar, etc.)
 

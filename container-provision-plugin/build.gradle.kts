@@ -10,11 +10,13 @@ version = "0.0.1"
 kotlin.jvmToolchain(21)
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
-    implementation("com.microsoft.playwright:playwright:1.51.0")
+    implementation(platform("education.cccp:workspace-bom:0.0.5"))
+    implementation("com.microsoft.playwright:playwright")
 }
 
 gradlePlugin {
