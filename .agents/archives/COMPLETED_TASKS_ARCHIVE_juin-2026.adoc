@@ -17,3 +17,16 @@
 - CP-1 Playwright Colab auth Google
 - CP-2 Tests
 - CP-6 Publication Maven Central
+
+=== S001 — Colab translation worker (2026-06-29)
+- Notebook `start-ollama-tunnel.ipynb` réécrit (14 commits)
+- Docker abandonné (nested overlayfs + iptables bloqués dans Colab)
+- Ollama installé directement (`curl | sh` + `zstd`)
+- Cache Google Drive (modèle, Gradle 9.6.1, .m2, GRADLE_USER_HOME)
+- Secrets Colab : REPO_OFFICE, site_name, github-api-key-cheroliv
+- JDK 25 Temurin (Eclipse Adoptium)
+- Repo correct : `cheroliv/office.git` → `sites/cheroliv.com/jbake/content/`
+- *BLOCAGE* : `org.jetbrains:annotations` 26.0.2-1 vs 17.0.0 sur classpath plugin
+  → `configurations.all { force }` ne couvre pas le classpath plugin
+  → `buildscript {} + apply()` casse l'extension type-safe `bakery {}`
+  → Piste : init.gradle.kts ou exclusion duct-tape ou bakery 0.0.3

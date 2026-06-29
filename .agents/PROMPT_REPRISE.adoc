@@ -1,7 +1,30 @@
-== Mission Session 001 — Premier lancement Colab
+== Mission Session 002 — Résoudre conflit annotations + traduction i18n
 
-- Lancer `provisionColabTranslation` avec le profil `cheroliv.tester`
-- Vérifier que Playwright ouvre Colab, connecte le runtime, exécute le notebook
-- Valider que `TRANSLATION_DONE=ok` est détecté
-- Ajuster les sélecteurs CSS/les timeouts si nécessaire
-- Documenter le résultat (succès/échec) et les ajustements
+=== Blocage actuel
+Le notebook Colab `start-ollama-tunnel.ipynb` s'exécute jusqu'à la tâche
+Gradle `migrateContentI18n` qui échoue : conflit `org.jetbrains:annotations`
+(26.0.2-1 vs 17.0.0). `configurations.all { force }` ne couvre pas le
+classpath plugin.
+
+=== Pistes à explorer (par ordre de priorité)
+1. `init.gradle.kts` avec `allprojects { configurations.all { force } }`
+   — couvre aussi le classpath plugin
+2. Exclure `duct-tape` (source de annotations:17.0.0) :
+   `configurations.all { exclude("org.rnorth.duct-tape") }`
+3. `pluginManagement { resolutionStrategy }` dans settings.gradle.kts
+4. Publier bakery-plugin 0.0.3 avec exclusion intégrée
+
+=== Une fois le build OK
+- Vérifier que `content-i18n/` est créé dans le site cloné
+- Vérifier le push sur `cheroliv/office.git` (branche main)
+- Valider la qualité de la traduction (fr → en)
+- Ajouter d'autres langues cibles (es, ar, etc.)
+
+=== Contexte technique
+- Ollama installé directement (pas Docker — Colab lacks nested overlayfs)
+- Cache sur Google Drive (`MyDrive/.colab-cache/`)
+- Secrets Colab : `REPO_OFFICE`, `site_name`, `github-api-key-cheroliv`
+- JDK 25 Temurin, Gradle 9.6.1
+- Site : `cheroliv/office.git` → `sites/cheroliv.com/jbake/content/`
+- Source language : fr, target : en
+- Modèle : `translategemma:4b`

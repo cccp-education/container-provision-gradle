@@ -1,0 +1,92 @@
+= Session 001 — Colab Translation Worker (i18n cheroliv.com)
+
+_Date : 2026-06-29_
+_Type : dev + debug_
+_Score : 6/10_
+
+== Objectif
+
+Lancer le notebook Colab `start-ollama-tunnel.ipynb` pour exécuter la traduction
+i18n du contenu de cheroliv.com (fr → en) sur GPU Google Colab via Ollama
++ bakery-gradle `migrateContentI18n`.
+
+== Réalisations
+
+=== Notebook Colab réécrit (14 commits)
+
+1. *Playwright Java abandonné* — Snap Chromium + Google anti-automation = blocage.
+   Solution manuelle : ouverture URL Colab dans Chromium existant + Ctrl+F9 via
+   xdotool/XTest.
+
+2. *Docker abandonné* — Colab ne supporte pas nested overlayfs (containerd
+   snapshotter `overlay` → `invalid argument`). iptables aussi bloqué
+   (Permission denied). Remplacé par install directe `curl | sh` d'Ollama.
+
+3. *Ollama direct install* — `curl -fsSL https://ollama.com/install.sh | sh` +
+   `zstd` (pré-requis manquant). Serveur démarré via `nohup ollama serve`.
+
+4. *Cache Google Drive* — Modèle (`OLLAMA_MODELS`), Gradle 9.6.1, `.m2`,
+   `GRADLE_USER_HOME` tous persistés sur Drive (`MyDrive/.colab-cache/`).
+
+5. *Secrets Colab* — `REPO_OFFICE`, `site_name`, `github-api-key-cheroliv`
+   lus via `userdata.get()`.
+
+6. *Repo correct* — `cheroliv/office.git` (monorepo), site dans
+   `sites/cheroliv.com/`, contenu dans `jbake/content/` (pas `content/`).
+
+7. *JDK 25 Temurin* — Remplacé OpenJDK 21 par Temurin 25 (Eclipse Adoptium).
+
+=== Blocage actuel
+
+Conflit de dépendance Gradle : `org.jetbrains:annotations` 26.0.2-1 (koog 0.8.0)
+vs 17.0.0 (testcontainers 1.21.4 via duct-tape 1.0.8). Le
+`resolutionStrategy.force` dans `configurations.all` ne couvre pas le classpath
+plugin. Tentative `buildscript {}` + `apply()` → `Unresolved reference 'bakery'`
+(l'extension type-safe n'est pas exposée).
+
+*État* : Le notebook s'exécute jusqu'à la tâche Gradle `migrateContentI18n`
+qui échoue sur la résolution de dépendances. Ollama fonctionne, le modèle est
+pull, le site est cloné — seul le build Gradle plante.
+
+== Commits (14)
+
+|===
+| Hash | Message
+| a72adfd | fix(colab): use noreply GitHub email, remove user.name
+| 3fd06e1 | fix(colab): robust Docker startup + correct repo URL + Drive model cache
+| 2a31b07 | fix(colab): dockerd --iptables=false for Colab + --network=host
+| 0a9e128 | feat(colab): read REPO_OFFICE + site_name from Colab secrets
+| d999f40 | refactor(colab): replace Docker with direct Ollama install
+| 22c87a5 | fix(colab): apt-get update before zstd install, show output
+| b098893 | fix(colab): show Gradle output + site structure for debugging
+| 197e80a | fix(colab): add missing import time
+| 1de059c | fix(colab): sourceDir = jbake/content (not content/)
+| dc4aabb | fix(colab): JDK 25 Temurin + rm before clone + full Gradle output
+| 962d974 | Créé à l'aide de Colab (commit Colab direct)
+| e49563d | fix(colab): force org.jetbrains:annotations:26.0.2-1
+| 2430f25 | fix(colab): buildscript classpath resolutionStrategy
+| 12c75d3 | debug(colab): show first+last 2k of STDERR
+| c83afad | fix(colab): restore plugins{} + configurations.all + --stacktrace
+|===
+
+== Décisions techniques
+
+1. *Docker → install directe* : Colab = container LXC, pas de nested overlayfs,
+   pas de iptables CAP_NET_ADMIN. Docker inutilisable.
+2. *Playwright → manuel* : Google détecte l'automation, Snap Chromium bloque
+   CDP. L'utilisateur ouvre Colab manuellement.
+3. *Cache Drive obligatoire* : modèle Ollama ~2GB, Gradle ~120MB, deps ~200MB.
+   Sans Drive, chaque session = 5-10 min de download.
+4. *Repo monorepo* : `cheroliv/office.git` contient tous les sites
+   (`sites/cheroliv.com/`, `sites/magic-stick/`, etc.)
+
+== Points ouverts
+
+- *Conflit annotations* : `configurations.all { force }` ne couvre pas le
+  classpath plugin. Solutions à explorer :
+  - `init.gradle.kts` avec `allprojects { configurations.all { ... } }`
+  - `pluginManagement { resolutionStrategy }` dans settings.gradle.kts
+  - Exclure `duct-tape` des dépendances testcontainers
+  - Publier bakery-plugin 0.0.3 avec exclusion `annotations:17.0.0`
+- *GPU non détecté* : `lspci` manquant dans Colab, Ollama tourne en CPU
+- *Clone 627MB* : office.git est lourd, envisager `--sparse` ou `--filter=blob:none`

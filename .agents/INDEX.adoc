@@ -1,15 +1,15 @@
 = INDEX — container-provision-gradle
 
-_Dernière mise à jour : 2026-06-28_
-_Session en cours : 000 — Bootstrap gouvernance (clôturée)_
-_Sessions terminées : 1_
+_Dernière mise à jour : 2026-06-29_
+_Session en cours : 002 — Résoudre conflit annotations + traduction i18n_
+_Sessions terminées : 2_
 
 == Roadmap
 
 |===
 | EPIC | Description | Statut | Priorité
 | CP-0 | Bootstrap gouvernance + structure projet | ✅ TERMINÉ | P0
-| CP-1 | Playwright Java Colab automation (migré depuis Node.js) | 🔄 EN COURS | P0
+| CP-1 | Colab notebook translation worker (Ollama + bakery i18n) | 🔄 EN COURS | P0
 | CP-2 | Tests Playwright Java + gestion auth Google | À FAIRE | P0
 | CP-3 | Pool de ports 3 instances Ollama (parallélisation) | À FAIRE | P1
 | CP-4 | Intégration bakery i18n (consommateur colab-worker) | À FAIRE | P1
@@ -33,7 +33,7 @@ container-provision-gradle/
 │       ├── ContainerProvisionPlugin.kt      → 3 tâches (install, npm, colab)
 │       └── ContainerProvisionExtension.kt   → DSL extension
 ├── colab/
-│   └── start-ollama-tunnel.ipynb → Notebook Colab autonome (Ollama + Gradle bakery)
+│   └── start-ollama-tunnel.ipynb → Notebook Colab (Ollama direct + Gradle bakery)
 ├── .agents/AGENT.adoc, INDEX.adoc, BACKLOG.adoc
 └── Gradle wrapper + LICENSE
 ```
@@ -43,6 +43,7 @@ container-provision-gradle/
 |===
 | # | Date | Type | Sujet | Score
 | 000 | 2026-06-28 | gouvernance | Bootstrap + code initial (Playwright Node.js, Colab notebook, gouvernance) | 8/10
+| 001 | 2026-06-29 | dev + debug | Colab translation worker — Docker→Ollama direct, conflit annotations non résolu | 6/10
 |===
 
 == Fichiers
@@ -52,5 +53,16 @@ container-provision-gradle/
 | `AGENT.adoc` | Règles absolues + architecture
 | `BACKLOG.adoc` | Suivi des tâches
 | `PROMPT_REPRISE.adoc` | Mission en cours
-| `colab/start-ollama-tunnel.ipynb` | Notebook Colab autonome
+| `colab/start-ollama-tunnel.ipynb` | Notebook Colab autonome (Ollama + Gradle bakery)
 |===
+
+== Notes Session 001
+
+- Docker abandonné (Colab lacks nested overlayfs + iptables CAP_NET_ADMIN)
+- Ollama installé directement via `curl | sh` + `zstd`
+- Cache Google Drive : modèle Ollama, Gradle 9.6.1, .m2, GRADLE_USER_HOME
+- Secrets Colab : REPO_OFFICE, site_name, github-api-key-cheroliv
+- JDK 25 Temurin (Eclipse Adoptium)
+- Repo : `cheroliv/office.git` → `sites/cheroliv.com/jbake/content/`
+- *BLOCAGE* : `org.jetbrains:annotations` 26.0.2-1 vs 17.0.0 sur classpath plugin
+- 14 commits pushés sur main
