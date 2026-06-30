@@ -39,3 +39,21 @@
 - container-provision-plugin : platform() BOM + Playwright géré par BOM
 - Test local validé : migrateContentI18n BUILD SUCCESSFUL, zéro conflit annotations
 - *RESTE* : bakery-plugin 0.0.2 sur Central n'a pas le code i18n récent → publier 0.0.3
+
+=== S004 — Playwright + Colab i18n cheroliv.com (2026-06-30)
+- Notebook Colab : 3 bugs corrigés
+  ** `dryRun = false` dans DSL bakery (sinon copie sans traduire)
+  ** Port `11434` natif (Colab isolé, pas de contrainte de plage)
+  ** Gradle copié vers `/content/gradle-local` (Drive monté noexec → PermissionError)
+- ColabTranslationTask.kt : Playwright `launchPersistentContext` (au lieu de `--user-data-dir` arg rejeté)
+- `resolvePlaywrightChromium()` : sélectionne chromium-1228 (v149) car chromium-1161 crashe (ELF)
+- Code robuste : waitForLoadState, guards connect/runAll, polling recoverable
+- build.gradle.kts : plugin container-provision 0.0.1 appliqué au root + DSL configuré
+- 2 commits pushés : `c4a752e`, `f5e045c`
+- Fenêtre Chromium + Colab ouverte par utilisateur (profil cheroliv.tester authentifié)
+- *RESTE* : Run end-to-end à valider (gradle-local corrigé, à re-tester sur Colab)
+
+== Prochaine session
+
+* CP-1d : Run end-to-end Colab → content-i18n/ → push office.git
+* Voir PROMPT_REPRISE.adoc pour procédure de relance détaillée

@@ -1,0 +1,67 @@
+= Session 004 — Playwright + Colab i18n migration cheroliv.com
+:session: 004
+:date: 2026-06-30
+:type: dev + debug
+:score: 6/10
+
+== Objectif
+
+Lancer la migration i18n de cheroliv.com (fr→en) via Playwright qui pilote
+le notebook Colab (compte cheroliv.tester@gmail.com authentifié).
+
+== Ce qui a été fait
+
+=== 1. Notebook Colab corrigé (3 bugs)
+
+* `dryRun = false` ajouté dans `contentI18nMigration` DSL (sinon la task
+  copie les fichiers sans les traduire — dryRun=true par défaut dans bakery)
+* Port `11434` natif restauré (Colab isolé, pas de contrainte de plage ;
+  11440 était inutile et cassait `ollama serve` qui démarre sur 11434)
+* Gradle copié vers `/content/gradle-local` (filesystem local exécutable)
+  car Google Drive monté `noexec` → `PermissionError` sur subprocess.run
+
+=== 2. ColabTranslationTask.kt corrigé (Playwright)
+
+* `launchPersistentContext(userDataDir, opts)` au lieu de
+  `--user-data-dir` en arg (Playwright refuse cet arg)
+* `resolvePlaywrightChromium()` : sélectionne chromium-1228 (v149) car
+  chromium-1161 crashe avec `elf_dynamic_array_reader.h tag not found`
+* Code robuste : `waitForLoadState`, guards sur connect/runAll,
+  polling recoverable (try/catch autour de textContent)
+
+=== 3. Runner-gradle câblé (root build.gradle.kts)
+
+* `education.cccp.container-provision` 0.0.1 appliqué au root
+* `containerProvision` DSL configuré (notebook URL, profil cheroliv.tester,
+  targetLangs=en, siteRepoUrl=office.git)
+
+=== 4. 3 commits pushés sur cccp-education/container-provision-gradle
+
+* `c4a752e` — port 11434 + dryRun=false + Playwright launchPersistentContext
+* `f5e045c` — gradle exécutable depuis filesystem local (Drive noexec)
+
+== État en fin de session
+
+* Notebook Colab synchronisé avec GitHub (commit `f5e045c`)
+* Fenêtre Chromium + Colab ouverte par l'utilisateur (profil cheroliv.tester)
+* Run "Run all" lancé manuellement → erreur `PermissionError` sur gradle
+  (corrigée dans le dernier push, à re-tester)
+* `content-i18n/` non encore créé (run pas allé au bout)
+
+== Bugs connus restants (à debugger session 005)
+
+. Vérifier que `ollama serve` démarre bien sur 11434 sur Colab runtime GPU
+. Vérifier que `translategemma:4b` se pull (modèle cloud vs local)
+. Vérifier que `migrateContentI18n` trouve `site.yml` (chemin siteDir)
+. Vérifier le push `content-i18n/` vers `cheroliv/office.git` (token)
+
+== Fichiers modifiés
+
+* `colab/start-ollama-tunnel.ipynb` — 3 corrections (dryRun, port, gradle-local)
+* `container-provision-plugin/src/main/kotlin/container/provision/ColabTranslationTask.kt` — Playwright robuste
+* `build.gradle.kts` — plugin container-provision appliqué au root
+
+== Commits
+
+* `c4a752e` fix(colab): port 11434 natif + dryRun=false + Playwright launchPersistentContext
+* `f5e045c` fix(colab): gradle exécutable depuis filesystem local (Drive noexec)

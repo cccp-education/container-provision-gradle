@@ -2,8 +2,8 @@
 
 _Dernière mise à jour : 2026-06-30_
 _Session en cours : aucune_
-_Session terminee : 003 — BOM 0.0.6 + notebook Colab mis à jour (BOM 0.0.6 + port 11440)_
-_Sessions terminées : 3_
+_Session terminee : 004 — Playwright + Colab i18n cheroliv.com (3 bugs notebook corrigés, launchPersistentContext)_
+_Sessions terminées : 4_
 
 == Roadmap
 
@@ -12,6 +12,9 @@ _Sessions terminées : 3_
 | CP-0 | Bootstrap gouvernance + structure projet | ✅ TERMINÉ | P0
 | EPIC CP-1 | Colab notebook translation worker (Ollama + bakery i18n) | 🔄 EN COURS | P0
 | CP-1a | Conflit annotations résolu via BOM 0.0.5 | ✅ TERMINÉ | P0
+| CP-1b | Bugs notebook corrigés (dryRun, port 11434, gradle-local noexec) | ✅ TERMINÉ (S004) | P0
+| CP-1c | Playwright launchPersistentContext + chromium-1228 | ✅ TERMINÉ (S004) | P0
+| CP-1d | Run end-to-end Colab → content-i18n/ → push office.git | 🔴 À VALIDER (S005) | P0
 | CP-2 | Tests Playwright Java + gestion auth Google | À FAIRE | P0
 | CP-3 | Pool de ports 3 instances Ollama (parallélisation) | À FAIRE | P1
 | CP-4 | Intégration bakery i18n (consommateur colab-worker) | À FAIRE | P1
@@ -24,18 +27,15 @@ _Sessions terminées : 3_
 ```
 container-provision-gradle/
 ├── settings.gradle.kts
-├── build.gradle.kts
+├── build.gradle.kts              → applique education.cccp.container-provision 0.0.1
 ├── container-provision-plugin/
 │   ├── build.gradle.kts          → plugin education.cccp.container-provision
-│   ├── gradle/libs.versions.toml
-│   ├── playwright/
-│   │   ├── package.json
-│   │   └── colab-worker.mjs      → Playwright Chromium → Colab automation
 │   └── src/main/kotlin/container/provision/
-│       ├── ContainerProvisionPlugin.kt      → 3 tâches (install, npm, colab)
-│       └── ContainerProvisionExtension.kt   → DSL extension
+│       ├── ContainerProvisionPlugin.kt      → tâche provisionColabTranslation
+│       ├── ContainerProvisionExtension.kt   → DSL extension
+│       └── ColabTranslationTask.kt          → Playwright → Colab automation
 ├── colab/
-│   └── start-ollama-tunnel.ipynb → Notebook Colab (Ollama direct + Gradle bakery)
+│   └── start-ollama-tunnel.ipynb → Notebook Colab (Ollama + Gradle bakery i18n)
 ├── .agents/AGENT.adoc, INDEX.adoc, BACKLOG.adoc
 └── Gradle wrapper + LICENSE
 ```
@@ -47,6 +47,8 @@ container-provision-gradle/
 | 000 | 2026-06-28 | gouvernance | Bootstrap + code initial (Playwright Node.js, Colab notebook, gouvernance) | 8/10
 | 001 | 2026-06-29 | dev + debug | Colab translation worker — Docker→Ollama direct, conflit annotations non résolu | 6/10
 | 002 | 2026-06-29 | dev + publication | BOM 0.0.5 : résolution conflit annotations + notebook Colab corrigé + test local validé | 8/10
+| 003 | 2026-06-30 | ops | BOM 0.0.6 + notebook Colab mis à jour | 8/10
+| 004 | 2026-06-30 | dev + debug | Playwright + Colab i18n cheroliv.com — 3 bugs notebook corrigés, launchPersistentContext | 6/10
 |===
 
 == Fichiers
@@ -59,12 +61,11 @@ container-provision-gradle/
 | `colab/start-ollama-tunnel.ipynb` | Notebook Colab autonome (Ollama + Gradle bakery)
 |===
 
-== Notes Session 002
+== Notes Session 004
 
-- BOM 0.0.5 publié sur Maven Central (bundle 77e1f71b)
-- 11 boroughs plugins + jetbrains-annotations:26.0.2-1 dans le BOM
-- Notebook Colab : pattern buildscript + platform() + apply() (pas plugins{})
-- Test local validé : migrateContentI18n BUILD SUCCESSFUL, zéro conflit annotations
-- container-provision-plugin : platform() BOM + Playwright géré par BOM
-- *RESTE* : bakery-plugin 0.0.2 sur Central n'a pas le code i18n récent (33 fichiers
-  non committés dans bakery-gradle). Publier 0.0.3 + BOM 0.0.6 avant test Colab réel.
+- Notebook Colab : 3 bugs corrigés (dryRun=false, port 11434 natif, gradle-local noexec)
+- ColabTranslationTask.kt : Playwright launchPersistentContext + chromium-1228 (v149)
+- build.gradle.kts : plugin container-provision appliqué au root + DSL configuré
+- 2 commits pushés sur cccp-education/container-provision-gradle (c4a752e, f5e045c)
+- Fenêtre Chromium + Colab ouverte par utilisateur (profil cheroliv.tester authentifié)
+- *RESTE* : Run end-to-end à valider (gradle-local corrigé, à re-tester sur Colab)

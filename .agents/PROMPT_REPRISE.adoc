@@ -1,29 +1,50 @@
-== Mission Session 004 — Relancer notebook Colab (BOM 0.0.6 + bakery 0.0.3)
+= PROMPT_REPRISE — container-provision-gradle
+:session: 005
+:date: 2026-06-30
+:etat: Notebook Colab corrigé (dryRun, port 11434, gradle-local). Run end-to-end à valider.
+:epic_actif: CP-1d — Run end-to-end Colab → content-i18n/ → push office.git
 
-=== Contexte
-Session 013 (workspace-bom) : BOM 0.0.6 publié sur Central. SEC-1 audit
-terminé (0 coupable). Notebook Colab mis à jour : BOM 0.0.6 + port 11440.
+== Contexte de fin (S004)
 
-=== Étapes
-1. Ouvrir `colab/start-ollama-tunnel.ipynb` sur Google Colab (runtime GPU)
-2. Exécuter toutes les cellules :
-   - Installation Ollama + pull modèle `translategemma:4b`
-   - Détection GPU (`nvidia-smi`)
-   - Clone `cheroliv/office.git` via secret `REPO_OFFICE`
-   - Gradle `migrateContentI18n` avec bakery-plugin 0.0.3 (résolu via BOM 0.0.6)
-   - Push `content-i18n/` sur `cheroliv/office.git` (branche main)
-3. Vérifier que `content-i18n/` est créé avec traductions fr→en
-4. Si OK, ajouter langues cibles (es, ar, zh, etc.)
+Le notebook Colab `colab/start-ollama-tunnel.ipynb` est corrigé et pushé
+sur GitHub (commit `f5e045c`). 3 bugs résolus :
+- `dryRun = false` dans DSL bakery (sinon copie sans traduire)
+- Port `11434` natif (Colab isolé, pas de contrainte de plage)
+- Gradle copié vers `/content/gradle-local` (Drive monté noexec)
 
-=== Contexte technique
-- BOM 0.0.6 sur Central (bundle 3b886b28)
-- bakery-plugin 0.0.3 sur Central (publié session 012)
-- Notebook : buildscript + platform("workspace-bom:0.0.6") + apply(bakery)
-- Port Ollama : 11440 (était 11434 INTERDIT, corrigé session 013)
-- Site : `cheroliv/office.git` → `sites/cheroliv.com/jbake/content/`
-- Source : fr, target : en
-- Modèle : `translategemma:4b`
-- Secrets Colab : `REPO_OFFICE`, `site_name`, `github-api-key-cheroliv`
+`ColabTranslationTask.kt` utilise `launchPersistentContext` + chromium-1228.
 
-=== Note
-Le notebook ne peut pas être exécuté depuis CLI — il faut Colab runtime GPU.
+== Reprendre à — Procédure de relance droite au but
+
+. `git pull` dans `foundry/public/container-provision-gradle/`
+. Vérifier notebook à jour : `git log --oneline -3 colab/start-ollama-tunnel.ipynb`
+. Ouvrir Colab dans Chromium (profil cheroliv.tester authentifié) :
++
+----
+https://colab.research.google.com/github/cccp-education/container-provision-gradle/blob/main/colab/start-ollama-tunnel.ipynb
+----
+. Sélectionner runtime GPU : Runtime → Change runtime type → T4 GPU
+. Cliquer "Run all"
+. Surveiller les logs :
+  ** Cell 3 : `Ollama ready.` (port 11434)
+  ** Cell 8 : `ls {SITE_DIR}/jbake/content/` (about, blog.adoc, robots.txt…)
+  ** Cell 9 : `migrateContentI18n` BUILD SUCCESSFUL
+  ** Cell 10 : `TRANSLATION_DONE=ok`
+. Vérifier `content-i18n/` créé : `git pull` dans `office/` puis
+  `ls office/sites/cheroliv.com/content-i18n/`
+
+== Bugs à debugger (session 005)
+
+. Si `ollama serve` ne démarre pas sur 11434 → vérifier logs `/tmp/ollama.log`
+. Si `translategemma:4b` ne se pull pas → modèle cloud (inférence) vs local
+. Si `migrateContentI18n` échoue → vérifier chemin `siteDir` + `site.yml`
+. Si push échoue → vérifier token `github-api-key-cheroliv` dans Colab secrets
+
+== Fichiers touchés (S004)
+
+- `colab/start-ollama-tunnel.ipynb` → 3 corrections (dryRun, port, gradle-local)
+- `container-provision-plugin/src/main/kotlin/container/provision/ColabTranslationTask.kt` → Playwright robuste
+- `build.gradle.kts` → plugin container-provision appliqué au root
+- `.agents/sessions/004-playwright-colab-i18n-cheroliv.com.adoc` → rapport session
+- `.agents/SESSIONS_HISTORY.adoc` → session 004 ajoutée
+- `.agents/INDEX.adoc` → CP-1b/1c terminés, CP-1d à valider

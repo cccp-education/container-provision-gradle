@@ -5,4 +5,6 @@
 | 000 | 2026-06-28 | gouvernance + dev | Bootstrap container-provision-gradle + code initial Playwright/Colab | 8/10
 | 001 | 2026-06-29 | dev + debug | Colab translation worker — Docker→Ollama direct, Drive cache, conflit annotations non résolu | 6/10
 | 002 | 2026-06-29 | dev + publication | BOM 0.0.5 : résolution conflit annotations + notebook Colab corrigé + test local validé | 8/10
+| 003 | 2026-06-30 | ops | BOM 0.0.6 + notebook Colab mis à jour (port 11440) | 8/10
+| 004 | 2026-06-30 | dev + debug | Playwright + Colab i18n cheroliv.com — 3 bugs notebook corrigés, Playwright launchPersistentContext | 6/10
 |===
