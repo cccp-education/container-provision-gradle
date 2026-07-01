@@ -1,7 +1,8 @@
 plugins {
     `java-library`
     `java-gradle-plugin`
-    kotlin("jvm")
+    `maven-publish`
+    kotlin("jvm") version "2.3.20"
 }
 
 group = "education.cccp"

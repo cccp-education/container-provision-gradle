@@ -53,7 +53,23 @@
 - Fenêtre Chromium + Colab ouverte par utilisateur (profil cheroliv.tester authentifié)
 - *RESTE* : Run end-to-end à valider (gradle-local corrigé, à re-tester sur Colab)
 
+=== S005 — Contournement blocage Google + arch plugin indépendant (2026-07-01)
+- *Blocage Google contourné* : Chromium snap en subprocess normal + connectOverCDP
+  (Playwright launchPersistentContext était détecté par Google via --enable-automation)
+- Flags anti-détection : --disable-blink-features=AutomationControlled, --no-first-run
+- Profil Chromium snap Profile 2 (authentifié Google Colab) via --user-data-dir + --profile-directory
+- Run all : raccourci clavier Ctrl+F9 (bypass shadow DOM Polymer de Colab)
+- Polling git : git ls-remote cheroliv/office.git détecte changement HEAD sha (remplace polling DOM fragile)
+- Architecture plugin indépendant (article 0124) :
+  ** container-provision-plugin/settings.gradle.kts créé (build autonome)
+  ** container-provision-plugin/gradlew + gradle/wrapper/* créés
+  ** include("container-provision-plugin") retiré de la racine
+  ** maven-publish ajouté (Gradle 9.x ne l'applique plus automatiquement)
+  ** kotlin 2.3.20 version explicite
+- Pipeline Gradle→Playwright→Chromium→Colab validé (30 min sans crash)
+- *RESTE* : Notebook ne push pas (secrets Colab à vérifier, ou erreur de cellule)
+
 == Prochaine session
 
-* CP-1d : Run end-to-end Colab → content-i18n/ → push office.git
+* CP-1d : Déboguer pourquoi le notebook Colab ne push pas (secrets, Ollama, cellule en erreur)
 * Voir PROMPT_REPRISE.adoc pour procédure de relance détaillée

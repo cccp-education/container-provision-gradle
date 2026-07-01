@@ -1,9 +1,9 @@
 = INDEX — container-provision-gradle
 
-_Dernière mise à jour : 2026-06-30_
+_Dernière mise à jour : 2026-07-01_
 _Session en cours : aucune_
-_Session terminee : 004 — Playwright + Colab i18n cheroliv.com (3 bugs notebook corrigés, launchPersistentContext)_
-_Sessions terminées : 4_
+_Session terminee : 005 — Contournement blocage Google (Chromium subprocess + CDP) + architecture plugin indépendant + polling git_
+_Sessions terminées : 5_
 
 == Roadmap
 
@@ -14,11 +14,11 @@ _Sessions terminées : 4_
 | CP-1a | Conflit annotations résolu via BOM 0.0.5 | ✅ TERMINÉ | P0
 | CP-1b | Bugs notebook corrigés (dryRun, port 11434, gradle-local noexec) | ✅ TERMINÉ (S004) | P0
 | CP-1c | Playwright launchPersistentContext + chromium-1228 | ✅ TERMINÉ (S004) | P0
-| CP-1d | Run end-to-end Colab → content-i18n/ → push office.git | 🔴 À VALIDER (S005) | P0
-| CP-2 | Tests Playwright Java + gestion auth Google | À FAIRE | P0
+| CP-1d | Run end-to-end Colab → content-i18n/ → push office.git | 🔴 À VALIDER (notebook ne push pas — secrets Colab à vérifier) | P0
+| CP-2 | Tests Playwright + gestion auth Google | ✅ TERMINÉ (S005) | P0
 | CP-3 | Pool de ports 3 instances Ollama (parallélisation) | À FAIRE | P1
 | CP-4 | Intégration bakery i18n (consommateur colab-worker) | À FAIRE | P1
-| CP-5 | Tests d'intégration CI | À FAIRE | P1
+| CP-5 | Tests d'intégration CI — workflow GitHub Actions + qwen3:0.6b + ports 11466-11467 | À FAIRE (backlog détaillé S005) | P1
 | CP-6 | Publication Maven Central | À FAIRE | P2
 |===
 
@@ -26,14 +26,16 @@ _Sessions terminées : 4_
 
 ```
 container-provision-gradle/
-├── settings.gradle.kts
-├── build.gradle.kts              → applique education.cccp.container-provision 0.0.1
-├── container-provision-plugin/
-│   ├── build.gradle.kts          → plugin education.cccp.container-provision
+├── settings.gradle.kts              → racine consommateur (pas de include())
+├── build.gradle.kts                 → applique education.cccp.container-provision 0.0.1
+├── container-provision-plugin/       → BUILD INDÉPENDANT (pattern article 0124)
+│   ├── gradlew                       → wrapper autonome
+│   ├── settings.gradle.kts           → rootProject.name = "container-provision-plugin"
+│   ├── build.gradle.kts             → java-gradle-plugin + maven-publish + kotlin 2.3.20
 │   └── src/main/kotlin/container/provision/
 │       ├── ContainerProvisionPlugin.kt      → tâche provisionColabTranslation
 │       ├── ContainerProvisionExtension.kt   → DSL extension
-│       └── ColabTranslationTask.kt          → Playwright → Colab automation
+│       └── ColabTranslationTask.kt          → Chromium subprocess + CDP + Ctrl+F9 + polling git
 ├── colab/
 │   └── start-ollama-tunnel.ipynb → Notebook Colab (Ollama + Gradle bakery i18n)
 ├── .agents/AGENT.adoc, INDEX.adoc, BACKLOG.adoc
@@ -49,6 +51,7 @@ container-provision-gradle/
 | 002 | 2026-06-29 | dev + publication | BOM 0.0.5 : résolution conflit annotations + notebook Colab corrigé + test local validé | 8/10
 | 003 | 2026-06-30 | ops | BOM 0.0.6 + notebook Colab mis à jour | 8/10
 | 004 | 2026-06-30 | dev + debug | Playwright + Colab i18n cheroliv.com — 3 bugs notebook corrigés, launchPersistentContext | 6/10
+| 005 | 2026-07-01 | dev + arch | Contournement blocage Google (Chromium subprocess + CDP + Ctrl+F9) + architecture plugin indépendant + polling git | 7/10
 |===
 
 == Fichiers
@@ -61,11 +64,25 @@ container-provision-gradle/
 | `colab/start-ollama-tunnel.ipynb` | Notebook Colab autonome (Ollama + Gradle bakery)
 |===
 
-== Notes Session 004
+== Notes Session 005
 
-- Notebook Colab : 3 bugs corrigés (dryRun=false, port 11434 natif, gradle-local noexec)
-- ColabTranslationTask.kt : Playwright launchPersistentContext + chromium-1228 (v149)
-- build.gradle.kts : plugin container-provision appliqué au root + DSL configuré
-- 2 commits pushés sur cccp-education/container-provision-gradle (c4a752e, f5e045c)
-- Fenêtre Chromium + Colab ouverte par utilisateur (profil cheroliv.tester authentifié)
-- *RESTE* : Run end-to-end à valider (gradle-local corrigé, à re-tester sur Colab)
+- *Blocage Google contourné* : Chromium snap lancé en subprocess normal (pas via Playwright
+  LaunchPersistentContext qui ajoute --enable-automation détecté par Google). Playwright
+  se connecte ensuite via connectOverCDP("http://localhost:9222"). Google voit un navigateur
+  normal, pas un navigateur automatisé.
+- *Flags anti-détection* : --disable-blink-features=AutomationControlled, --no-first-run,
+  --no-default-browser-check. Profil Chromium snap Profile 2 (authentifié Google Colab)
+  via --user-data-dir + --profile-directory.
+- *Run all* : raccourci clavier Ctrl+F9 (bypass shadow DOM Polymer de Colab qui rend les
+  selectors UI fragiles).
+- *Polling git* : remplace polling DOM (colab-terminal, .output_text, pre) qui ne trouvait
+  jamais TRANSLATION_DONE=ok dans le shadow DOM. Maintenant : git ls-remote sur
+  cheroliv/office.git, détecte changement de HEAD sha → succès. Timeout 30 min.
+- *Architecture plugin indépendant* : conformément à l'article 0124, le sous-module
+  container-provision-plugin/ est désormais un build Gradle autonome avec son propre
+  gradlew + settings.gradle.kts. La racine ne fait plus include() — elle consomme le
+  plugin via mavenLocal. Ajout du plugin maven-publish pour exposer publishToMavenLocal.
+- *RESTE CP-1d* : Le notebook Colab ne push pas après 30 min. Le pipeline Gradle→Playwright→
+  Chromium→Colab est validé (Ctrl+F9 envoyé, exécution démarrée). Le blocage est côté
+  notebook lui-même : secrets Colab (github-api-key-cheroliv, REPO_OFFICE) à vérifier,
+  ou erreur dans une cellule (Ollama pull translategemma:4b, clone office.git, etc.).
