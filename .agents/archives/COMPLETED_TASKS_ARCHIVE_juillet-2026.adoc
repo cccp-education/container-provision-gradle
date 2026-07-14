@@ -1,0 +1,37 @@
+= COMPLETED_TASKS_ARCHIVE — Juillet 2026 — container-provision-gradle
+
+== Sessions archivées
+
+=== S006 — Rotation LLM api-key-pool + abandon Colab/Playwright (2026-07-14)
+
+*Type* : dev + arch
+*Score* : 7/10
+
+== Ce qui a été fait
+
+. Diagnostic blocage CP-1d : magic commands Jupyter indentées dans blocs Python `if`
+   - Cellule 16 (Gradle download) : `!curl`/`!unzip` → `subprocess.run([...], check=True)`
+   - Cellule 21 (push git) : `!git remote set-url`/`!git push` → `subprocess.run([...], cwd=SITE_ROOT)`
+   - Commit `75906f1` sur `cccp-education/container-provision-gradle`
+
+. Abandon Colab/Playwright : 5 sessions sans résultat, trop de points de défaillance
+
+. Intégration api-key-pool (borough Liberty) dans bakery-plugin :
+   - BOM 0.0.1 → 0.0.8 + `education.ccp:api-key-pool:0.0.1` + `i18n-contracts:0.0.2`
+   - `IaConfig.portRange: IntRange?` — configurer la plage de ports
+   - `PooledOllamaLlmService` — rotation round-robin `ApiKeyPool.getNextKey()` + fallback
+   - `ContentTaskRegistrar` — pool si `portRange` set, sinon single endpoint (compat descendante)
+   - Commit `ac92cf9` sur `cccp-education/bakery-gradle`
+
+. Validation : 13/13 fichiers `.adoc` traduits, 0 erreurs, `gemma4:31b-cloud`, 5m45s
+
+== Bugs restants
+
+. Parser AsciiDoc : rendu cassé (titre vide, contenu aplati) — bug `PivotArticle`
+. Traduction complète 635 fichiers non lancée
+. Publication bakery-plugin 0.0.4 sur Maven Central
+
+== Commits
+
+. `75906f1` fix(colab): replace indented magic commands with subprocess.run
+. `ac92cf9` feat(i18n): integrate api-key-pool for round-robin LLM rotation across ports 11437-11465

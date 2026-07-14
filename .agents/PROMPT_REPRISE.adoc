@@ -1,48 +1,46 @@
 = PROMPT_REPRISE — container-provision-gradle
-:session: 006
-:date: 2026-07-01
-:etat: Pipeline Gradle→Playwright→Chromium→Colab validé. Notebook ne push pas (cause côté Colab).
-:epic_actif: CP-1d — Déboguer pourquoi le notebook Colab ne push pas après exécution
+:session: 007
+:date: 2026-07-14
+:etat: Rotation LLM api-key-pool intégrée dans bakery-plugin. 13/13 fichiers traduits. Rendu AsciiDoc cassé.
+:epic_actif: CP-1d — Corriger parser AsciiDoc + lancer traduction complète 635 fichiers
 
-== Contexte de fin (S005)
+== Contexte de fin (S006)
 
-Le blocage Google anti-automation est contourné :
-- Chromium snap lancé en subprocess normal (pas via Playwright launch)
-- Playwright se connecte via connectOverCDP("http://localhost:9222")
-- Profil Profile 2 (authentifié Google Colab) passé via --user-data-dir + --profile-directory
-- Ctrl+F9 = "Run all" (bypass shadow DOM Polymer)
-- Polling git (git ls-remote cheroliv/office.git) remplace polling DOM fragile
-- Architecture plugin indépendant (pattern article 0124) : container-provision-plugin/
-  a son propre gradlew + settings.gradle.kts + maven-publish. La racine ne fait plus
-  include().
+Abandon Colab/Playwright. Rotation LLM locale via api-key-pool (borough Liberty).
 
-Le pipeline s'exécute 30 min sans crash, mais le notebook ne push pas sur office.git.
-Le blocage est maintenant côté notebook Colab lui-même.
+bakery-plugin (commit `ac92cf9` sur cccp-education/bakery-gradle) :
+- BOM 0.0.8 + api-key-pool:0.0.1 + i18n-contracts:0.0.2
+- `IaConfig.portRange: IntRange?` — configurer la plage de ports
+- `PooledOllamaLlmService` — rotation round-robin via `ApiKeyPool.getNextKey()`
+  + fallback (essaie tous les ports si un échoue)
+- `ContentTaskRegistrar` — utilise le pool si `portRange` set, sinon single endpoint
 
-== Reprendre à — CP-1d débogage notebook
+container-provision-gradle (commit `75906f1`) :
+- Notebook Colab : magic commands indentées corrigées (subprocess.run)
 
-. Ouvrir la fenêtre Chromium encore ouverte (profil Profile 2, Colab)
-. Vérifier quelle cellule est en erreur :
-  ** Cell 8 : `ollama pull translategemma:4b` (modèle cloud vs local ?)
-  ** Cell 12 : `userdata.get('github-api-key-cheroliv')` (secret configuré ?)
-  ** Cell 18 : `userdata.get('REPO_OFFICE')` (secret configuré ?)
-  ** Cell 19 : `migrateContentI18n` BUILD SUCCESSFUL ou FAILED ?
-  ** Cell 21 : `git push origin main` (token valide ?)
-. Corriger le notebook si erreur, push sur GitHub, relancer provisionColabTranslation
+Validation : 13/13 fichiers traduits, 0 erreurs, gemma4:31b-cloud, 5m45s.
 
-== Fichiers touchés (S005)
+== Reprendre à — Bug parser AsciiDoc + traduction complète
 
-- `container-provision-plugin/src/main/kotlin/container/provision/ColabTranslationTask.kt`
-  → Réécrit : Chromium subprocess + connectOverCDP + Ctrl+F9 + polling git (pollGitForCompletion)
-  + fallback polling DOM (pollDomForCompletion)
-- `container-provision-plugin/build.gradle.kts` → ajout maven-publish + kotlin 2.3.20 version
-- `container-provision-plugin/settings.gradle.kts` → créé (build autonome)
-- `container-provision-plugin/gradlew` + `gradle/wrapper/*` → créés (wrapper autonome)
-- `settings.gradle.kts` racine → include("container-provision-plugin") retiré
-- `.agents/INDEX.adoc` → session 005 ajoutée, roadmap mise à jour
-- `.agents/BACKLOG.adoc` → CP-2 TERMINÉ, CP-5 détaillé (workflow CI + qwen3:0.6b)
-- `.agents/sessions/005-contournement-google-arch-independante.adoc` → rapport session
+. Corriger le bug `PivotArticle` parser/renderer :
+   - Titre devient `title=` vide dans le rendu traduit
+   - Contenu aplati (frontmatter + body sur une ligne)
+   - Voir `bakery.pivot.AsciiDocParser` + `bakery.pivot.AsciiDocRenderer`
+. Lancer traduction complète 635 fichiers :
+   - `gradle migrateContentI18n -PsiteDir=/tmp/cheroliv-site -PtargetLangs=en`
+   - Temps estimé ~5h (635 fichiers × plusieurs blocs × LLM)
+. Copier `content-i18n/en/` vers `office/sites/cheroliv.com/content-i18n/en/`
+. Commit + push sur `cheroliv/office.git`
+
+== Fichiers touchés (S006)
+
+- `colab/start-ollama-tunnel.ipynb` — magic commands → subprocess.run
+- `bakery-plugin/build.gradle.kts` — BOM 0.0.8 + api-key-pool
+- `bakery-plugin/src/main/kotlin/bakery/llm/IaConfig.kt` — portRange
+- `bakery-plugin/src/main/kotlin/bakery/llm/PooledOllamaLlmService.kt` — nouveau
+- `bakery-plugin/src/main/kotlin/bakery/ContentTaskRegistrar.kt` — pool wiring
 
 == Commits
 
-À pusher après fin de session (permission utilisateur requise).
+- `75906f1` fix(colab): replace indented magic commands with subprocess.run
+- `ac92cf9` feat(i18n): integrate api-key-pool for round-robin LLM rotation

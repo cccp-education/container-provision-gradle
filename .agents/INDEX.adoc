@@ -1,9 +1,9 @@
 = INDEX — container-provision-gradle
 
-_Dernière mise à jour : 2026-07-01_
+_Dernière mise à jour : 2026-07-14_
 _Session en cours : aucune_
-_Session terminee : 005 — Contournement blocage Google (Chromium subprocess + CDP) + architecture plugin indépendant + polling git_
-_Sessions terminées : 5_
+_Session terminée : 006 — Rotation LLM api-key-pool + abandon Colab/Playwright_
+_Sessions terminées : 6_
 
 == Roadmap
 
@@ -14,7 +14,7 @@ _Sessions terminées : 5_
 | CP-1a | Conflit annotations résolu via BOM 0.0.5 | ✅ TERMINÉ | P0
 | CP-1b | Bugs notebook corrigés (dryRun, port 11434, gradle-local noexec) | ✅ TERMINÉ (S004) | P0
 | CP-1c | Playwright launchPersistentContext + chromium-1228 | ✅ TERMINÉ (S004) | P0
-| CP-1d | Run end-to-end Colab → content-i18n/ → push office.git | 🔴 À VALIDER (notebook ne push pas — secrets Colab à vérifier) | P0
+| CP-1d | Run end-to-end Colab → content-i18n/ → push office.git | 🔄 EN COURS (rotation locale validée 13/13, bug parser AsciiDoc restant) | P0
 | CP-2 | Tests Playwright + gestion auth Google | ✅ TERMINÉ (S005) | P0
 | CP-3 | Pool de ports 3 instances Ollama (parallélisation) | À FAIRE | P1
 | CP-4 | Intégration bakery i18n (consommateur colab-worker) | À FAIRE | P1
@@ -52,6 +52,7 @@ container-provision-gradle/
 | 003 | 2026-06-30 | ops | BOM 0.0.6 + notebook Colab mis à jour | 8/10
 | 004 | 2026-06-30 | dev + debug | Playwright + Colab i18n cheroliv.com — 3 bugs notebook corrigés, launchPersistentContext | 6/10
 | 005 | 2026-07-01 | dev + arch | Contournement blocage Google (Chromium subprocess + CDP + Ctrl+F9) + architecture plugin indépendant + polling git | 7/10
+| 006 | 2026-07-14 | dev + arch | Rotation LLM api-key-pool + abandon Colab/Playwright — bakery-plugin intégré, 13/13 traduits | 7/10
 |===
 
 == Fichiers

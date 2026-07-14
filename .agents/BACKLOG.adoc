@@ -15,7 +15,7 @@
 
 == EPIC CP-1 : Colab notebook translation worker (P0)
 
-*Statut* : 🔄 EN COURS (Session 002)
+*Statut* : 🔄 EN COURS (Session 006 — rotation locale validée, Colab abandonné)
 
 - [x] Notebook `start-ollama-tunnel.ipynb` autonome (Ollama + Gradle bakery)
 - [x] Install Ollama directe (curl | sh) — Docker abandonné (nested overlayfs)
@@ -25,13 +25,13 @@
 - [x] JDK 25 Temurin
 - [x] Git clone + push avec token auth
 - [x] *BLOCAGE RÉSOLU* : Conflit `org.jetbrains:annotations` résolu via BOM 0.0.5
-  - workspace-bom 0.0.5 publié sur Maven Central (11 boroughs + annotations:26.0.2-1)
-  - Notebook : pattern buildscript + platform() + apply() (pas plugins{})
-  - Test local validé : migrateContentI18n BUILD SUCCESSFUL
-- [ ] *RESTE* : Publier bakery-plugin 0.0.3 (code i18n récent non publié)
-- [ ] Publier workspace-bom 0.0.6 (qui référence bakery-plugin 0.0.3)
-- [ ] Vérifier que `content-i18n/` est créé après traduction (test Colab réel)
-- [ ] Vérifier le push sur `cheroliv/office.git`
+- [x] Magic commands Jupyter corrigées (S006 — subprocess.run)
+- [x] *ROTATION LLM* : api-key-pool intégré dans bakery-plugin (S006 — PooledOllamaLlmService)
+- [x] *VALIDATION* : 13/13 fichiers traduits, 0 erreurs, gemma4:31b-cloud sur 11437-11465
+- [ ] *RESTE* : Corriger bug parser AsciiDoc (rendu cassé — titre vide, contenu aplati)
+- [ ] Lancer traduction complète 635 fichiers
+- [ ] Copier content-i18n/en/ vers office/sites/cheroliv.com/ + commit + push
+- [ ] Publication bakery-plugin 0.0.4 (avec api-key-pool) sur Maven Central
 - [ ] Ajouter d'autres langues cibles (es, ar, etc.)
 
 == EPIC CP-2 : Tests Playwright + gestion auth Google (P0)
