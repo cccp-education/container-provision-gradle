@@ -1,46 +1,85 @@
 = PROMPT_REPRISE — container-provision-gradle
-:session: 007
-:date: 2026-07-14
-:etat: Rotation LLM api-key-pool intégrée dans bakery-plugin. 13/13 fichiers traduits. Rendu AsciiDoc cassé.
-:epic_actif: CP-1d — Corriger parser AsciiDoc + lancer traduction complète 635 fichiers
+:session: 008
+:date: 2026-07-15
+:etat: Parser AsciiDoc JBake native CORRIGÉ. TDD/BDD validé. Traduction 635 fichiers interrompue (partielle 122/1575).
+:epic_actif: CP-1d — Relancer traduction complète 635 fichiers + améliorer prompt LLM
 
-== Contexte de fin (S006)
+== Contexte de fin (S007)
 
-Abandon Colab/Playwright. Rotation LLM locale via api-key-pool (borough Liberty).
+Bug parser AsciiDoc CORRIGÉ dans bakery-plugin (Bushwick). Le parser ne gérait
+que le format pivot (`title=.../~~~~~~`), pas le format JBake natif
+(`= Title` / `@Author` / `:jbake-*:`) utilisé par cheroliv.com.
 
-bakery-plugin (commit `ac92cf9` sur cccp-education/bakery-gradle) :
-- BOM 0.0.8 + api-key-pool:0.0.1 + i18n-contracts:0.0.2
-- `IaConfig.portRange: IntRange?` — configurer la plage de ports
-- `PooledOllamaLlmService` — rotation round-robin via `ApiKeyPool.getNextKey()`
-  + fallback (essaie tous les ports si un échoue)
-- `ContentTaskRegistrar` — utilise le pool si `portRange` set, sinon single endpoint
+=== Correction — bakery-plugin (NON commité)
 
-container-provision-gradle (commit `75906f1`) :
-- Notebook Colab : magic commands indentées corrigées (subprocess.run)
+`AsciiDocParser.kt` — détection automatique du format :
+- `isPivotFormat()` : cherche `~~~~~~` → format pivot existant
+- `parseJbakeNativeFormat()` : nouveau — parse `= Title`, `@Author`, date,
+  `:jbake-title:`, `:jbake-date:`, `:jbake-type:`, `:jbake-status:`
+- Le body commence après la première ligne vide suivant le header
 
-Validation : 13/13 fichiers traduits, 0 erreurs, gemma4:31b-cloud, 5m45s.
+=== Baby-step TDD/BDD — 3 niveaux validés
 
-== Reprendre à — Bug parser AsciiDoc + traduction complète
+1. **Unit tests** : `AsciiDocParserTest.kt` (+3 tests), `AsciiDocParserJbakeRealFileTest.kt`
+   (nouveau, 2 tests sur fichier réel 2019) → 36/36 PASS
+2. **Cucumber BDD** : `49_asciidoc_parser_jbake_native.feature` (nouveau) +
+   `AsciiDocParserJbakeNativeSteps.kt` (nouveau) → 3/3 scénarios PASS
+3. **Roundtrip** : Parser→Renderer→Parser sur fichier réel → structure préservée
 
-. Corriger le bug `PivotArticle` parser/renderer :
-   - Titre devient `title=` vide dans le rendu traduit
-   - Contenu aplati (frontmatter + body sur une ligne)
-   - Voir `bakery.pivot.AsciiDocParser` + `bakery.pivot.AsciiDocRenderer`
-. Lancer traduction complète 635 fichiers :
-   - `gradle migrateContentI18n -PsiteDir=/tmp/cheroliv-site -PtargetLangs=en`
-   - Temps estimé ~5h (635 fichiers × plusieurs blocs × LLM)
-. Copier `content-i18n/en/` vers `office/sites/cheroliv.com/content-i18n/en/`
-. Commit + push sur `cheroliv/office.git`
+=== Autres modifs bakery (NON commitées)
 
-== Fichiers touchés (S006)
+- `build.gradle.kts` — BOM 0.0.8→0.0.9, versions explicites api-key-pool:0.0.1 +
+  i18n-contracts:0.0.2 (BOM 0.0.8 absente de mavenLocal)
 
-- `colab/start-ollama-tunnel.ipynb` — magic commands → subprocess.run
-- `bakery-plugin/build.gradle.kts` — BOM 0.0.8 + api-key-pool
-- `bakery-plugin/src/main/kotlin/bakery/llm/IaConfig.kt` — portRange
-- `bakery-plugin/src/main/kotlin/bakery/llm/PooledOllamaLlmService.kt` — nouveau
-- `bakery-plugin/src/main/kotlin/bakery/ContentTaskRegistrar.kt` — pool wiring
+=== Traduction 635 fichiers — INTERROMPUE
 
-== Commits
+- Projet wrapper créé à `/tmp/opencode/cheroliv-i18n/` (symlinks vers
+  `office/sites/cheroliv.com/jbake` et `i18n`)
+- 5715 fichiers copiés (635 × 9 langues) dans `i18n/{lang}/`
+- Traduction LLM partielle : EN 122/175, autres langues 0/175
+- Process tué — le `/tmp` a été nettoyé entre temps
+- Problème : ConnectException sur ports Ollama (pool surchargé par 1575 requêtes)
+- Le fallback du pool gère les erreurs mais certaines traductions échouent
 
-- `75906f1` fix(colab): replace indented magic commands with subprocess.run
-- `ac92cf9` feat(i18n): integrate api-key-pool for round-robin LLM rotation
+== Reprendre à (S008)
+
+. **Commit bakery-plugin** : les modifs parser + tests + build.gradle.kts ne sont
+   pas commitées. Demander permission.
+. **Relancer traduction complète** :
+   - Recréer projet wrapper `/tmp/opencode/cheroliv-i18n/` (symlinks jbake + i18n)
+   - `./gradlew migrateContentI18n` avec `--contentI18nTargetLangs=en,zh,hi,es,ar,bn,pt,ru,ur`
+   - Lancer langue par langue pour éviter surcharge pool Ollama
+   - Ports actifs : 11437-11465, modèle `gemma4:31b-cloud`
+. **Améliorer prompt LLM** (`LlmServiceTranslationAdapter.kt:33`) :
+   - Prompt actuel : `"Translate from X to Y:\n{text}"` → LLM hallucine
+     ("Here are a few ways to translate this...")
+   - Nouveau prompt : directif, demander juste la traduction sans commentaires
+. **Vérifier rendu** : titre non vide, structure préservée (headings, source blocks)
+. **Commit + push** sur `cheroliv/office.git` après validation
+
+== Fichiers modifiés (S007, NON commités)
+
+=== bakery-plugin (foundry/public/bakery-gradle)
+- `src/main/kotlin/bakery/pivot/AsciiDocParser.kt` — support JBake natif (+55 lignes)
+- `src/test/kotlin/bakery/pivot/AsciiDocParserTest.kt` — +3 tests JBake natif
+- `src/test/kotlin/bakery/pivot/AsciiDocParserJbakeRealFileTest.kt` — nouveau
+- `src/test/features/49_asciidoc_parser_jbake_native.feature` — nouveau
+- `src/test/scenarios/bakery/scenarios/AsciiDocParserJbakeNativeSteps.kt` — nouveau
+- `build.gradle.kts` — BOM 0.0.9 + versions explicites
+
+=== container-provision-gradle
+- Aucune modification de code (session 007 = travail sur bakery-plugin)
+
+== Rappels
+
+- GroupId : `education.cccp`, Plugin ID : `education.cccp.bakery`
+- bakery-plugin version : 0.0.3 (mavenLocal)
+- BOM workspace-bom : Central 0.0.9, mavenLocal 0.0.9
+- api-key-pool : 0.0.1 (mavenLocal), i18n-contracts : 0.0.2 (Central)
+- Ports Ollama : 11437-11465, modèle `gemma4:31b-cloud`
+- 10 langues cibles : en, zh, hi, es, fr(source), ar, bn, pt, ru, ur
+- Contenu source : `office/sites/cheroliv.com/jbake/content/` (635 fichiers, 175 .adoc)
+- Sortie traduction : `office/sites/cheroliv.com/i18n/{lang}/`
+- Baby-step TDD : RED → GREEN → REFACTOR (unit → functional → cucumber)
+- English only: code, Gherkin, comments — no French
+- INTERDICTION de commit/push sans permission explicite
