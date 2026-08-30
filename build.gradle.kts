@@ -1,5 +1,5 @@
 plugins {
-    id("education.cccp.build.cucumber") version "0.0.2"
+    id("education.cccp.build.cucumber") version "0.0.4"
     id("education.cccp.container-provision") version "0.0.1"
 }
 
