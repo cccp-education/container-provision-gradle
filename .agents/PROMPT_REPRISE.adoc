@@ -82,4 +82,4 @@ que le format pivot (`title=.../~~~~~~`), pas le format JBake natif
 - Sortie traduction : `office/sites/cheroliv.com/i18n/{lang}/`
 - Baby-step TDD : RED → GREEN → REFACTOR (unit → functional → cucumber)
 - English only: code, Gherkin, comments — no French
-- INTERDICTION de commit/push sans permission explicite
+- Git autorisé (décision pilote 2026-09-17) — zéro secret commité

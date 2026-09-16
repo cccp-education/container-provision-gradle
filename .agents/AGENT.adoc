@@ -2,7 +2,7 @@
 
 == Règles Absolues
 
-. Zéro commit sans permission explicite
+. Commit/push/merge autorisés (décision pilote 2026-09-17). Ne JAMAIS commiter de secret.
 . Lire PROMPT_REPRISE.adoc avant toute action
 . Vérifier git status avant de coder
 . Privilégier Edit (partiel) plutôt que Write (écrasement)
