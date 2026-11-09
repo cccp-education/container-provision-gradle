@@ -87,3 +87,7 @@ container-provision-gradle/
   Chromium→Colab est validé (Ctrl+F9 envoyé, exécution démarrée). Le blocage est côté
   notebook lui-même : secrets Colab (github-api-key-cheroliv, REPO_OFFICE) à vérifier,
   ou erreur dans une cellule (Ollama pull translategemma:4b, clone office.git, etc.).
+
+== Session 007 — JitPack mirror (CNV-16)
+
+Publication JitPack de container-provision-plugin 0.0.1. JitPack : 0.0.1 — POM HTTP 200.

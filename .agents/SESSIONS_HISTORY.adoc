@@ -10,3 +10,9 @@
 | 005 | 2026-07-01 | dev + arch | Contournement blocage Google (Chromium subprocess + CDP + Ctrl+F9) + architecture plugin indépendant + polling git | 7/10
 | 006 | 2026-07-14 | dev + arch | Rotation LLM api-key-pool + abandon Colab/Playwright — bakery-plugin intégré (BOM 0.0.8), PooledOllamaLlmService, 13/13 traduits 0 erreurs | 7/10
 |===
+
+== Session 007 — JitPack mirror (CNV-16) — 2026-11-09
+
+Publication JitPack de container-provision-plugin 0.0.1. JitPack : 0.0.1 — POM HTTP 200. Shim `useModule` pour
+`education.cccp.build.*` (tag JitPack `0.0.15`). Rapport
+`.agents/sessions/007-jitpack-mirror.adoc`.
