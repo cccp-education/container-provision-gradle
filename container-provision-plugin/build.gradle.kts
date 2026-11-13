@@ -13,10 +13,11 @@ kotlin.jvmToolchain(21)
 repositories {
     mavenLocal()
     mavenCentral()
+    maven("https://jitpack.io")
 }
 
 dependencies {
-    implementation(platform("education.cccp:workspace-bom:0.0.5"))
+    implementation(platform("com.github.cccp-education.workspace-bom:workspace-bom:0.0.136"))
     implementation("com.microsoft.playwright:playwright")
 }
 
