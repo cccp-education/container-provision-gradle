@@ -1,85 +1,50 @@
-= PROMPT_REPRISE — container-provision-gradle
+= PROMPT_REPRISE — container-provision-gradle — Session 008 (close) — CNV-17 JitPack canal unique
 :session: 008
-:date: 2026-07-15
-:etat: Parser AsciiDoc JBake native CORRIGÉ. TDD/BDD validé. Traduction 635 fichiers interrompue (partielle 122/1575).
-:epic_actif: CP-1d — Relancer traduction complète 635 fichiers + améliorer prompt LLM
+:date: 2026-11-13
+:etat: TERMINÉE
+:epic_actif: CNV-17 (JitPack canal unique) — clôture documentaire
+:epic_suivant: CP-1 / CP-1d (worker de traduction Colab) — session 009
 
-== Contexte de fin (S007)
+== Session 008 terminée — CNV-17 (JitPack canal unique)
 
-Bug parser AsciiDoc CORRIGÉ dans bakery-plugin (Bushwick). Le parser ne gérait
-que le format pivot (`title=.../~~~~~~`), pas le format JBake natif
-(`= Title` / `@Author` / `:jbake-*:`) utilisé par cheroliv.com.
+Décision pilote : « la totalité vers JitPack ». JitPack est le **canal unique**
+des artefacts publics ; Maven Central (nmcp) et le Gradle Plugin Portal ne sont
+plus publiés pour `foundry/public/**`. Un artefact = un canal = un nom = une
+version. `foundry/private/**` et `office/**` exclus.
 
-=== Correction — bakery-plugin (NON commité)
+* Shim `useModule` : `education.cccp.build.*` →
+  `com.github.cccp-education.conventions-gradle:conventions-plugin:0.0.17`
+  (racine + sous-build `container-provision-plugin`).
+* `maven("https://jitpack.io")` ajouté aux `repositories` du projet
+  `container-provision-plugin`.
+* Plateforme N0 : `com.github.cccp-education.workspace-bom:workspace-bom:0.0.136`.
+* Coordonnée servie :
+  `com.github.cccp-education.container-provision-gradle:container-provision-plugin:0.0.1`.
+* Aucune CI déclenchée (pas de workflow) ; aucun test local (Local = Build,
+  Tests = CI). Zéro code Kotlin modifié.
 
-`AsciiDocParser.kt` — détection automatique du format :
-- `isPivotFormat()` : cherche `~~~~~~` → format pivot existant
-- `parseJbakeNativeFormat()` : nouveau — parse `= Title`, `@Author`, date,
-  `:jbake-title:`, `:jbake-date:`, `:jbake-type:`, `:jbake-status:`
-- Le body commence après la première ligne vide suivant le header
+*Rapport* : `.agents/sessions/008-cnv-17-jitpack-channel.adoc`
 
-=== Baby-step TDD/BDD — 3 niveaux validés
+*Note* : l'en-tête `session: 008` de l'ancien PROMPT_REPRISE (CP-1d,
+2026-07-15) n'avait pas de rapport correspondant — dérive préexistante. La
+clôture prend `008` ; le fonctionnel CP-1/CP-1d passe en `009`.
 
-1. **Unit tests** : `AsciiDocParserTest.kt` (+3 tests), `AsciiDocParserJbakeRealFileTest.kt`
-   (nouveau, 2 tests sur fichier réel 2019) → 36/36 PASS
-2. **Cucumber BDD** : `49_asciidoc_parser_jbake_native.feature` (nouveau) +
-   `AsciiDocParserJbakeNativeSteps.kt` (nouveau) → 3/3 scénarios PASS
-3. **Roundtrip** : Parser→Renderer→Parser sur fichier réel → structure préservée
+== Prochaine mission (session 009) — CP-1 / CP-1d
 
-=== Autres modifs bakery (NON commitées)
+Reprise du worker de traduction Colab (`provisionColabTranslation`).
 
-- `build.gradle.kts` — BOM 0.0.8→0.0.9, versions explicites api-key-pool:0.0.1 +
-  i18n-contracts:0.0.2 (BOM 0.0.8 absente de mavenLocal)
-
-=== Traduction 635 fichiers — INTERROMPUE
-
-- Projet wrapper créé à `/tmp/opencode/cheroliv-i18n/` (symlinks vers
-  `office/sites/cheroliv.com/jbake` et `i18n`)
-- 5715 fichiers copiés (635 × 9 langues) dans `i18n/{lang}/`
-- Traduction LLM partielle : EN 122/175, autres langues 0/175
-- Process tué — le `/tmp` a été nettoyé entre temps
-- Problème : ConnectException sur ports Ollama (pool surchargé par 1575 requêtes)
-- Le fallback du pool gère les erreurs mais certaines traductions échouent
-
-== Reprendre à (S008)
-
-. **Commit bakery-plugin** : les modifs parser + tests + build.gradle.kts ne sont
-   pas commitées. Demander permission.
-. **Relancer traduction complète** :
-   - Recréer projet wrapper `/tmp/opencode/cheroliv-i18n/` (symlinks jbake + i18n)
-   - `./gradlew migrateContentI18n` avec `--contentI18nTargetLangs=en,zh,hi,es,ar,bn,pt,ru,ur`
-   - Lancer langue par langue pour éviter surcharge pool Ollama
-   - Ports actifs : 11437-11465, modèle `gemma4:31b-cloud`
-. **Améliorer prompt LLM** (`LlmServiceTranslationAdapter.kt:33`) :
-   - Prompt actuel : `"Translate from X to Y:\n{text}"` → LLM hallucine
-     ("Here are a few ways to translate this...")
-   - Nouveau prompt : directif, demander juste la traduction sans commentaires
-. **Vérifier rendu** : titre non vide, structure préservée (headings, source blocks)
-. **Commit + push** sur `cheroliv/office.git` après validation
-
-== Fichiers modifiés (S007, NON commités)
-
-=== bakery-plugin (foundry/public/bakery-gradle)
-- `src/main/kotlin/bakery/pivot/AsciiDocParser.kt` — support JBake natif (+55 lignes)
-- `src/test/kotlin/bakery/pivot/AsciiDocParserTest.kt` — +3 tests JBake natif
-- `src/test/kotlin/bakery/pivot/AsciiDocParserJbakeRealFileTest.kt` — nouveau
-- `src/test/features/49_asciidoc_parser_jbake_native.feature` — nouveau
-- `src/test/scenarios/bakery/scenarios/AsciiDocParserJbakeNativeSteps.kt` — nouveau
-- `build.gradle.kts` — BOM 0.0.9 + versions explicites
-
-=== container-provision-gradle
-- Aucune modification de code (session 007 = travail sur bakery-plugin)
+. Vérifier le pipeline Gradle→Playwright→Chromium→Colab (Ctrl+F9 validé)
+. Traiter le blocage de push du notebook (secrets Colab `REPO_OFFICE`,
+   `github-api-key-cheroliv`, cellules Ollama/clone)
+. Lancer la traduction 635 fichiers langue par langue (pool Ollama
+   11437-11465, `gemma4:31b-cloud`, éviter la surcharge)
+. Vérifier le rendu (titre non vide, structure préservée)
 
 == Rappels
 
-- GroupId : `education.cccp`, Plugin ID : `education.cccp.bakery`
-- bakery-plugin version : 0.0.3 (mavenLocal)
-- BOM workspace-bom : Central 0.0.9, mavenLocal 0.0.9
-- api-key-pool : 0.0.1 (mavenLocal), i18n-contracts : 0.0.2 (Central)
-- Ports Ollama : 11437-11465, modèle `gemma4:31b-cloud`
-- 10 langues cibles : en, zh, hi, es, fr(source), ar, bn, pt, ru, ur
-- Contenu source : `office/sites/cheroliv.com/jbake/content/` (635 fichiers, 175 .adoc)
-- Sortie traduction : `office/sites/cheroliv.com/i18n/{lang}/`
+- GroupId `education.cccp`, plugin id `education.cccp.container-provision`
+- Architecture article 0124 : plugin indépendant + racine consommateur
+- Publication : JitPack uniquement (CP-6 « Maven Central » est remplacé)
 - Baby-step TDD : RED → GREEN → REFACTOR (unit → functional → cucumber)
-- English only: code, Gherkin, comments — no French
-- Git autorisé (décision pilote 2026-09-17) — zéro secret commité
+- English only : code, Gherkin, commentaires
+- Local = Build, Tests = CI ; zéro secret commité

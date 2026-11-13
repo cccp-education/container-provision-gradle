@@ -16,3 +16,15 @@
 Publication JitPack de container-provision-plugin 0.0.1. JitPack : 0.0.1 — POM HTTP 200. Shim `useModule` pour
 `education.cccp.build.*` (tag JitPack `0.0.15`). Rapport
 `.agents/sessions/007-jitpack-mirror.adoc`.
+
+== Session 008 — CNV-17 : JitPack canal unique — 2026-11-13
+
+JitPack devient le **canal unique** des artefacts publics (Central/Portal
+cessent d'être publiés pour `foundry/public/**`). Shim `useModule` aligné sur
+`conventions-plugin:0.0.17` (racine + sous-build), `maven("https://jitpack.io")`
+ajouté aux `repositories` du projet, plateforme N0
+`com.github.cccp-education.workspace-bom:workspace-bom:0.0.136`. Coordonnée
+servie
+`com.github.cccp-education.container-provision-gradle:container-provision-plugin:0.0.1`.
+Aucune CI déclenchée ; aucun test local. `CP-1`/`CP-1d` reportés en session
+009. Rapport `.agents/sessions/008-cnv-17-jitpack-channel.adoc`.

@@ -1,9 +1,9 @@
 = INDEX — container-provision-gradle
 
-_Dernière mise à jour : 2026-07-14_
+_Dernière mise à jour : 2026-11-13_
 _Session en cours : aucune_
-_Session terminée : 006 — Rotation LLM api-key-pool + abandon Colab/Playwright_
-_Sessions terminées : 6_
+_Session terminée : 008 — CNV-17 JitPack canal unique (documentation) — shim `conventions-plugin:0.0.17`, JitPack aux repositories projet, BOM `0.0.136`_
+_Sessions terminées : 9 (000→008)_
 
 == Roadmap
 
@@ -91,3 +91,14 @@ container-provision-gradle/
 == Session 007 — JitPack mirror (CNV-16)
 
 Publication JitPack de container-provision-plugin 0.0.1. JitPack : 0.0.1 — POM HTTP 200.
+
+== Session 008 — CNV-17 : JitPack canal unique — 2026-11-13
+
+JitPack devient le canal **unique** des artefacts publics (Central/Portal
+cessent d'être publiés pour `foundry/public/**`). Shim `useModule` aligné sur
+`conventions-plugin:0.0.17` (racine + sous-build), `maven("https://jitpack.io")`
+ajouté aux `repositories` du projet, plateforme N0 JitPack
+`workspace-bom:0.0.136`. Coordonnée servie :
+`com.github.cccp-education.container-provision-gradle:container-provision-plugin:0.0.1`.
+Aucune CI déclenchée. `CP-1`/`CP-1d` reportés en session 009. Rapport
+`.agents/sessions/008-cnv-17-jitpack-channel.adoc`.

@@ -75,3 +75,17 @@
 == EPIC CP-6 : Publication Maven Central (P2)
 
 *Statut* : À FAIRE
+
+'''
+== Historique — Session 008 — CNV-17 (JitPack canal unique)
+
+* Décision pilote : JitPack = **canal unique** des artefacts publics. Maven
+  Central (nmcp) et le Gradle Plugin Portal ne sont plus publiés pour
+  `foundry/public/**` ; `foundry/private/**` et `office/**` exclus.
+* `container-provision-plugin 0.0.1` est servi en
+  `com.github.cccp-education.container-provision-gradle:container-provision-plugin:0.0.1`.
+* Shim `conventions-plugin:0.0.17`, JitPack ajouté aux `repositories` du projet,
+  plateforme N0 `workspace-bom:0.0.136`.
+* `CP-6` (« Publication Maven Central ») change de canal : JitPack, pas Central.
+* `CP-1`/`CP-1d` restent ouverts ; reportés en session 009.
+* Rapport : `.agents/sessions/008-cnv-17-jitpack-channel.adoc`

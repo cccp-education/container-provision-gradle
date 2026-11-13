@@ -1,0 +1,56 @@
+= Session 008 — CNV-17 : JitPack canal unique (publication)
+:toc: left
+:icons: font
+
+:session: 008
+:date: 2026-11-13
+:type: cross-borough / JitPack
+:statut: TERMINÉE
+
+== Mission
+
+Clôture de **CNV-17** (décision pilote « la totalité vers JitPack ») pour
+`container-provision-gradle` : JitPack est le **canal unique** des artefacts
+publics ; Maven Central (nmcp) et le Gradle Plugin Portal ne sont plus publiés
+pour `foundry/public/**`. Un artefact = un canal = un nom = une version.
+`foundry/private/**` et `office/**` exclus.
+
+== Changements (état mesuré)
+
+* `settings.gradle.kts` et `container-provision-plugin/settings.gradle.kts` :
+  shim `useModule` des conventions `education.cccp.build.*` vers
+  `com.github.cccp-education.conventions-gradle:conventions-plugin:0.0.17`
+  (JitPack) + `maven("https://jitpack.io")` en `pluginManagement` et
+  `dependencyResolutionManagement`.
+* `container-provision-plugin/build.gradle.kts` : `maven("https://jitpack.io")`
+  ajouté aux `repositories` **du projet** ; plateforme N0 JitPack
+  `com.github.cccp-education.workspace-bom:workspace-bom:0.0.136`. Version
+  publiée `0.0.1`. Coordonnée servie :
+  `com.github.cccp-education.container-provision-gradle:container-provision-plugin:0.0.1`
+  (S-007). Aucun code Kotlin modifié.
+
+== Preuves
+
+* Lecture du build : plus aucune coordonnée `education.cccp:<artefact>` en
+  dépendance ; BOM et conventions résolus en coordonnées JitPack.
+* Table HTTP 200 du cadrage CNV-17
+  (`conventions-gradle/conventions-plugin/.agents/CADRAGE_EPIC_CNV_17_JITPACK_PRIMARY.adoc`
+  §3.3) : `container-provision-plugin 0.0.1` ✅.
+* Aucune CI déclenchée (pas de workflow) ; aucun test local (Local = Build,
+  Tests = CI).
+
+== Fichiers touchés (documentation uniquement)
+
+`.agents/sessions/008-cnv-17-jitpack-channel.adoc`, `.agents/SESSIONS_HISTORY.adoc`,
+`.agents/INDEX.adoc`, `.agents/BACKLOG.adoc`, `.agents/PROMPT_REPRISE.adoc`.
+
+== Note de numérotation
+
+L'ancien `PROMPT_REPRISE.adoc` portait déjà `session: 008` (mission CP-1d,
+2026-07-15) sans rapport `008` : dérive préexistante. La clôture prend `008` ;
+`CP-1`/`CP-1d` passent en `009`.
+
+== Suite
+
+Maintenance. `CP-1`/`CP-1d` restent ouverts ; `CP-6` (« publication Maven
+Central ») est remplacé par le canal JitPack (D1 CNV-17).
