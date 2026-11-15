@@ -1,0 +1,12 @@
+= COMPLETED_TASKS_ARCHIVE — Novembre 2026 (container-provision-gradle)
+
+== S-009 — GBL-014-5 / GBL-014-4 : canal conditionnel et shim 0.0.20 ✅
+
+* `settings.gradle.kts` (racine + sous-build) conditionnels `-Pchannel` (défaut
+  `jitpack` ; JitPack repo + shim seulement en `jitpack`) — `9c4f5fa`.
+* Shim conventions `0.0.18` → `0.0.19` — `493276f`, puis `0.0.19` → `0.0.20`
+  — `b06b79a` (racine + sous-build).
+* `CHANNEL OK` à la racine (convention `education.cccp.build.cucumber`).
+  Sous-build : aucune convention appliquée → `verifyChannel` absente.
+* Aucun code Kotlin, aucun test, aucune publication.
+* Rapport `.agents/sessions/009-gbl-014-5-channel-conditional-settings.adoc`.

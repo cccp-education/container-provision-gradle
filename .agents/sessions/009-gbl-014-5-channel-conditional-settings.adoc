@@ -1,0 +1,76 @@
+= Session 009 — GBL-014-5 / GBL-014-4 : canal conditionnel et shim 0.0.20
+:toc: left
+:icons: font
+
+:session: 009
+:date: 2026-11-15
+:type: cross-borough / build + publication (GBL-014)
+:statut: TERMINÉE
+
+== Contexte
+
+Session globale 229 (2026-11-15). Décision pilote « option B » (2026-11-14) : le
+canal de publication est une **propriété du build**
+(`-Pchannel=central|jitpack`, défaut `jitpack`), jamais une branche. GBL-014-5
+rend les `settings.gradle.kts` conditionnels, GBL-014-4 repointe le shim des
+conventions. `container-provision` est le premier dépôt aligné sur le tag
+`conventions-plugin:0.0.20` (celui qui enregistre `verifyChannel` depuis toutes
+les conventions).
+
+Références : `AGENTS.adoc` § « Publication (Règle 2) », cadrage
+`.agents/CADRAGE_EPIC_GBL_014_DUAL_CHANNEL.adoc` (racine workspace).
+
+== Changements (état mesuré)
+
+* `9c4f5fa` — **GBL-014-5** : `settings.gradle.kts` (racine **et**
+  `container-provision-plugin/settings.gradle.kts`) conditionnels. Le repository
+  JitPack et le shim `useModule` (`education.cccp.build.*`) ne sont déclarés que
+  si `channel == "jitpack"` ; `dependencyResolutionManagement` JitPack idem.
+* `493276f` — **GBL-014-4** : shim repoinné `0.0.18` → `0.0.19`.
+* `b06b79a` — **GBL-014 US-5** : shim repoinné `0.0.19` → `0.0.20`
+  (`com.github.cccp-education.conventions-gradle:conventions-plugin:0.0.20`),
+  racine + sous-build.
+
+Aucun code Kotlin modifié ; version publiée inchangée (`container-provision-plugin`
+0.0.1, canal JitPack, voir S-007).
+
+== Preuves
+
+|===
+| Élément | Statut
+| `git log` du 2026-11-15 | `9c4f5fa`, `493276f`, `b06b79a` (3 commits, working tree propre)
+| Diff | 2 `settings.gradle.kts` (+30/−16, puis +1/−1 et +1/−1)
+| CI du dépôt | n/a (aucun workflow)
+| `verifyChannel` (GBL-014-4) | `CHANNEL OK` **à la racine** — le build racine applique `education.cccp.build.cucumber`
+| `verifyChannel` (sous-build) | tâche **absente** : `container-provision-plugin` n'applique encore aucune convention (build autonome `java-library` + `java-gradle-plugin` + `maven-publish`)
+| Compilation / test | **aucun lancé** (Local = Build, Tests = CI ; session documentaire)
+| Double canal `education.cccp:*` | ✅ aucun (`central` n'est qu'une branche de settings)
+| Secret | ✅ aucun
+|===
+
+== Reste / observation (hors périmètre, non modifié)
+
+`container-provision-plugin/build.gradle.kts` conserve
+`implementation(platform("com.github.cccp-education.workspace-bom:workspace-bom:0.0.136"))` :
+c'est la même classe de constat **D5** que la réparation appliquée à `bureau`
+(correctif `d0e302b`) — un BOM JitPack relabellé perd `dependencyManagement` et
+n'est pas un `platform` fiable. Non corrigé ici : la clôture ne modifie aucun
+code (périmètre `.adoc`), et le build compile sur le canal par défaut. À traiter
+dans une session GBL-014 dédiée.
+
+== Fichiers touchés (documentation uniquement)
+
+`.agents/sessions/009-gbl-014-5-channel-conditional-settings.adoc`,
+`.agents/SESSIONS_HISTORY.adoc`, `.agents/INDEX.adoc`, `.agents/BACKLOG.adoc`,
+`.agents/archives/COMPLETED_TASKS_ARCHIVE_2026-11.adoc`,
+`.agents/PROMPT_REPRISE.adoc`.
+
+== Note de numérotation
+
+Le `PROMPT_REPRISE` précédent (008) réservait `009` à `CP-1`/`CP-1d`. La clôture
+prend `009` (GBL-014) ; `CP-1`/`CP-1d` passent à la **session 010**.
+
+== Suite
+
+`CP-1`/`CP-1d` (worker de traduction : bug parser AsciiDoc, traduction des 635
+fichiers). Aucun test, aucune publication, aucun secret.

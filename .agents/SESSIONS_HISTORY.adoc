@@ -28,3 +28,13 @@ servie
 `com.github.cccp-education.container-provision-gradle:container-provision-plugin:0.0.1`.
 Aucune CI déclenchée ; aucun test local. `CP-1`/`CP-1d` reportés en session
 009. Rapport `.agents/sessions/008-cnv-17-jitpack-channel.adoc`.
+
+== Session 009 — GBL-014-5 / GBL-014-4 : canal conditionnel et shim 0.0.20 — 2026-11-15
+
+`settings.gradle.kts` (racine + `container-provision-plugin/settings.gradle.kts`)
+conditionnels `-Pchannel` (défaut `jitpack` ; JitPack repo + shim seulement en
+`jitpack`). Shim conventions repointé `0.0.19` puis `0.0.20` (tag JitPack qui
+enregistre `verifyChannel` depuis toutes les conventions). `CHANNEL OK` à la
+racine ; le sous-build n'applique encore aucune convention (tâche absente).
+Aucune CI, aucun test, aucune publication. `CP-1`/`CP-1d` reportés en session
+010. Rapport `.agents/sessions/009-gbl-014-5-channel-conditional-settings.adoc`.

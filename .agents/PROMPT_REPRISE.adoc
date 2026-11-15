@@ -1,37 +1,27 @@
-= PROMPT_REPRISE — container-provision-gradle — Session 008 (close) — CNV-17 JitPack canal unique
-:session: 008
-:date: 2026-11-13
+= PROMPT_REPRISE — container-provision-gradle — Session 009 (close) — GBL-014-5 / GBL-014-4
+:session: 009
+:date: 2026-11-15
 :etat: TERMINÉE
-:epic_actif: CNV-17 (JitPack canal unique) — clôture documentaire
-:epic_suivant: CP-1 / CP-1d (worker de traduction Colab) — session 009
+:epic_actif: GBL-014 (canal dual) — rollout settings + shim
+:epic_suivant: CP-1 / CP-1d (worker de traduction Colab) — session 010
 
-== Session 008 terminée — CNV-17 (JitPack canal unique)
+== Session 009 terminée — canal conditionnel + shim 0.0.20
 
-Décision pilote : « la totalité vers JitPack ». JitPack est le **canal unique**
-des artefacts publics ; Maven Central (nmcp) et le Gradle Plugin Portal ne sont
-plus publiés pour `foundry/public/**`. Un artefact = un canal = un nom = une
-version. `foundry/private/**` et `office/**` exclus.
+* `settings.gradle.kts` (racine **et** `container-provision-plugin/`) :
+  repository JitPack et shim `useModule` (`education.cccp.build.*`) déclarés
+  **seulement** si `-Pchannel=jitpack` (défaut) ; `dependencyResolutionManagement`
+  JitPack idem.
+* Shim conventions repointé `0.0.19` puis **`0.0.20`** (tag qui enregistre
+  `verifyChannel` depuis toutes les conventions).
+* `CHANNEL OK` à la racine (le build racine applique
+  `education.cccp.build.cucumber`) ; le sous-build autonome n'applique encore
+  aucune convention → `verifyChannel` absente (dette de gate connue).
+* Aucun code Kotlin, aucun test, aucune publication, aucun secret.
+* Rapport : `.agents/sessions/009-gbl-014-5-channel-conditional-settings.adoc`.
 
-* Shim `useModule` : `education.cccp.build.*` →
-  `com.github.cccp-education.conventions-gradle:conventions-plugin:0.0.17`
-  (racine + sous-build `container-provision-plugin`).
-* `maven("https://jitpack.io")` ajouté aux `repositories` du projet
-  `container-provision-plugin`.
-* Plateforme N0 : `com.github.cccp-education.workspace-bom:workspace-bom:0.0.136`.
-* Coordonnée servie :
-  `com.github.cccp-education.container-provision-gradle:container-provision-plugin:0.0.1`.
-* Aucune CI déclenchée (pas de workflow) ; aucun test local (Local = Build,
-  Tests = CI). Zéro code Kotlin modifié.
+== Prochaine mission (session 010) — CP-1 / CP-1d
 
-*Rapport* : `.agents/sessions/008-cnv-17-jitpack-channel.adoc`
-
-*Note* : l'en-tête `session: 008` de l'ancien PROMPT_REPRISE (CP-1d,
-2026-07-15) n'avait pas de rapport correspondant — dérive préexistante. La
-clôture prend `008` ; le fonctionnel CP-1/CP-1d passe en `009`.
-
-== Prochaine mission (session 009) — CP-1 / CP-1d
-
-Reprise du worker de traduction Colab (`provisionColabTranslation`).
+Reprise du worker de traduction (`provisionColabTranslation`).
 
 . Vérifier le pipeline Gradle→Playwright→Chromium→Colab (Ctrl+F9 validé)
 . Traiter le blocage de push du notebook (secrets Colab `REPO_OFFICE`,
@@ -44,7 +34,7 @@ Reprise du worker de traduction Colab (`provisionColabTranslation`).
 
 - GroupId `education.cccp`, plugin id `education.cccp.container-provision`
 - Architecture article 0124 : plugin indépendant + racine consommateur
-- Publication : JitPack uniquement (CP-6 « Maven Central » est remplacé)
+- Publication : canal **dual** `-Pchannel` (défaut `jitpack`) ; un tag = un commit
 - Baby-step TDD : RED → GREEN → REFACTOR (unit → functional → cucumber)
 - English only : code, Gherkin, commentaires
 - Local = Build, Tests = CI ; zéro secret commité

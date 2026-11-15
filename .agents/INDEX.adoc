@@ -1,9 +1,10 @@
 = INDEX — container-provision-gradle
 
+_Derniere mise a jour : 2026-11-15 — Session 009 — GBL-014-5 : settings conditionnels `-Pchannel` (défaut `jitpack`) + shim conventions `0.0.20` (GBL-014 US-5)_
 _Dernière mise à jour : 2026-11-13_
 _Session en cours : aucune_
-_Session terminée : 008 — CNV-17 JitPack canal unique (documentation) — shim `conventions-plugin:0.0.17`, JitPack aux repositories projet, BOM `0.0.136`_
-_Sessions terminées : 9 (000→008)_
+_Session terminée : 009 — GBL-014-5 / GBL-014-4 : settings conditionnels au canal, shim `conventions-plugin:0.0.20`, `CHANNEL OK` racine_
+_Sessions terminées : 10 (000→009)_
 
 == Roadmap
 
